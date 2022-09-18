@@ -1,4 +1,5 @@
 from enum import Enum
+from random import randint
 from sub import Sub
 from constants import Player, Direction, ALPHA_BOARD, Power
 
@@ -55,7 +56,6 @@ class Game:
             self.declared_direction = action
         elif self.phase == Phase.Breakdown:
             self.player.breakdown(action, self.declared_direction)
-            # TODO: check for clearing and damamge
         elif self.phase == Phase.Mark_Power:
             self.player.mark(action)
         else:
@@ -66,15 +66,15 @@ class Game:
     def legal_actions(self):
         if self.phase == Phase.Starting:
             actions = []
-            for x in range(self.board):
-                for y in range(self.board[x]):
+            for x in range(len(self.board)):
+                for y in range(len(self.board[x])):
                     if self.board[x][y] == 0:
                         actions.append((x,y))
             return actions
         elif self.phase == Phase.Choose_Power:
             return self.player.get_active_powers()
         elif self.phase == Phase.Movement:
-            return self.player.get_valid_directions()
+            return self.player.get_valid_directions(self.board)
         elif self.phase == Phase.Breakdown:
             return self.player.get_unbroken_breakdowns(self.declared_direction)
         elif self.phase == Phase.Mark_Power:
@@ -104,7 +104,7 @@ class Game:
             self.phase_num = 0
             self.phase = self.PHASES[self.phase_num]
         else:
-            self.phase += 1
+            self.phase_num += 1
             self.phase = self.PHASES[self.phase_num]
 
     
@@ -120,4 +120,12 @@ class Game:
 
 
 if __name__ == "__main__":
-    Game()
+    g = Game()
+    while True:
+        print("---------------------------------------")
+        print(f"player: {g.player.player}")
+        options = g.legal_actions()
+        print(g.phase)
+        print(options)
+        action = randint(0,len(options)-1)
+        g.step(options[int(action)])
