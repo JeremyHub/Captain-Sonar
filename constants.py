@@ -7,7 +7,7 @@ class Direction(Enum):
     West = "west"
     East = "east"
 
-DIRECTION_COORDS = {
+DIRECTION_COORDS = { #col, row
     Direction.North: (0,1),
     Direction.South: (0,-1),
     Direction.West: (-1,0),

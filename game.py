@@ -67,10 +67,10 @@ class Game:
     def legal_actions(self):
         if self.phase == Phase.Starting:
             actions = []
-            for x in range(len(self.board)):
-                for y in range(len(self.board[x])):
-                    if self.board[x][y] == 0:
-                        actions.append((x,y))
+            for row in range(len(self.board)):
+                for col in range(len(self.board[0])):
+                    if self.board[row][col] == 0:
+                        actions.append((row,col))
             return actions
         elif self.phase == Phase.Choose_Power:
             return self.player.get_active_powers()

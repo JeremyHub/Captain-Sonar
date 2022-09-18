@@ -33,6 +33,7 @@ class Sub:
 
     
     def move(self, direction):
+        self.path.append(self.loc)
         self.loc = self._get_coord_in_direction(direction)
 
     
@@ -74,9 +75,9 @@ class Sub:
     def get_valid_directions(self, board):
         valid_directions = []
         for direction in Direction:
-            x,y = self._get_coord_in_direction(direction)
-            if 0 < y < len(board) and 0 < x < len(board[0]):
-                if board[x][y] == 0 and (x,y) not in self.path:
+            row,col = self._get_coord_in_direction(direction)
+            if 0 < row < len(board) and 0 < col < len(board[0]):
+                if board[row][col] == 0 and (row,col) not in self.path:
                     valid_directions.append(direction)
         # TODO: add surfacing
         return valid_directions
@@ -88,16 +89,16 @@ class Sub:
 
 
     def get_quadrant(self, board):
-        x_half = int(self.loc[0] > len(board)-1)
-        y_half = int(self.loc[1] > len(board[0])-1)
-        return x_half + 2*y_half
+        col_half = int(self.loc[1] > len(board[0])-1)
+        row_half = int(self.loc[0] > len(board)-1)
+        return col_half + 2*row_half
 
     
     def _get_coord_in_direction(self, direction):
-        dirX, dirY = DIRECTION_COORDS[direction]
-        x = self.loc[0] + dirX
-        y = self.loc[1] + dirY
-        return (x,y)
+        dir_col, dir_row = DIRECTION_COORDS[direction]
+        row = self.loc[0] + dir_row
+        col = self.loc[1] + dir_col
+        return (row,col)
 
 
     def _check_breakdown_clearing(self):
