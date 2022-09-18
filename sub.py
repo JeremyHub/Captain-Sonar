@@ -86,6 +86,12 @@ class Sub:
         powers = [p for p in Power if p not in self.get_active_powers()]
         return powers if powers else [None]
 
+
+    def get_quadrant(self, board):
+        x_half = int(self.loc[0] > len(board)-1)
+        y_half = int(self.loc[1] > len(board[0])-1)
+        return x_half + 2*y_half
+
     
     def _get_coord_in_direction(self, direction):
         dirX, dirY = DIRECTION_COORDS[direction]
