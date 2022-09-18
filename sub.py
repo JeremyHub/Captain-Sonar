@@ -40,10 +40,14 @@ class Sub:
                 breakdown.disabled = True
                 return
         raise Exception("breakdown not found")
+    
+
+    def mark(self, power):
+        self.powers[power] += 1
 
     
     def get_active_powers(self):
-        active = []
+        active = [None]
         for power, marks in self.powers.items():
             cost = POWER_COSTS[power]
             assert marks <= cost and marks >= 0, "{} on {} power".format(marks, power)
@@ -57,6 +61,7 @@ class Sub:
         for breakdown in self.breakdownMap.map[direction]:
             if not breakdown.disabled:
                 options.append(breakdown)
+        assert options, "all breakdowns are disabled"
         return options
 
 
@@ -67,7 +72,13 @@ class Sub:
             if 0 < y < len(board) or 0 < x < len(board[0]):
                 if board[x][y] == 0 and (x,y) not in self.path:
                     valid_directions.append(direction)
+        # TODO: add surfacing
         return valid_directions
+
+    
+    def get_unmarked_powers(self):
+        powers = set(Power) - set(self.get_active_powers())
+        return powers if powers else [None]
 
     
     def _get_coord_in_direction(self, direction):

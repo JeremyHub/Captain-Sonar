@@ -1,26 +1,28 @@
 from enum import Enum
-from turn import Turn
 from sub import Sub
-from constants import Player, Direction, ALPHA_BOARD
+from constants import Player, Direction, ALPHA_BOARD, Power
 
 
 class Phase(Enum):
     Starting = "starting phase"
-    Power = "power phase"
+    Choose_Power = "choose power phase"
+    Aim_Powers = "aim power phase"
     Movement = "movement phase"
     Breakdown = "breakdown phase"
+    Mark_Power = "mark power phase"
 
 
 class Game:
 
-    PHASES = [Phase.Power, Phase.Movement, Phase.Breakdown, Phase.Power]
-    history: list[Turn]
+    PHASES = [Phase.Choose_Power, Phase.Movement, Phase.Breakdown, Phase.Mark_Power, Phase.Choose_Power]
     p1: Sub
     p2: Sub
     player: Sub
-    phase: int or Phase
+    phase: Phase
+    phase_num: int
     board: tuple[tuple[int]]
     declared_direction: Direction
+    action_used: bool
     
 
     def __init__(self):
@@ -33,38 +35,52 @@ class Game:
         self.p2 = Sub(Player.Two)
         self.player = self.p1
         self.phase = Phase.Starting
+        self.phase_num = None
         self.board = ALPHA_BOARD
         self.declared_direction = None
+        self.action_used = None
 
     
     def step(self, action):
-        if self.PHASES[self.phase] == Phase.Starting:
+        if self.phase == Phase.Starting:
             self.player.set_starting_loc(action)
-        elif self.PHASES[self.phase] == Phase.Power:
-            pass
-        elif self.PHASES[self.phase] == Phase.Movement:
+        elif self.phase == Phase.Choose_Power:
+            if action is not None:
+                self.handle_power(action)
+                self.action_used = True
+            else:
+                self.action_used = False
+        elif self.phase == Phase.Movement:
             self.player.move(action)
             self.declared_direction = action
-        elif self.PHASES[self.phase] == Phase.Breakdown:
+        elif self.phase == Phase.Breakdown:
             self.player.breakdown(action, self.declared_direction)
+            # TODO: check for clearing and damamge
+        elif self.phase == Phase.Mark_Power:
+            self.player.mark(action)
+        else:
+            raise Exception("phase not found")
         self.next_phase()
 
     
     def legal_actions(self):
-        if self.PHASES[self.phase] == Phase.Starting:
+        if self.phase == Phase.Starting:
             actions = []
             for x in range(self.board):
                 for y in range(self.board[x]):
                     if self.board[x][y] == 0:
                         actions.append((x,y))
             return actions
-        elif self.PHASES[self.phase] == Phase.Power:
+        elif self.phase == Phase.Choose_Power:
             return self.player.get_active_powers()
-        elif self.PHASES[self.phase] == Phase.Movement:
+        elif self.phase == Phase.Movement:
             return self.player.get_valid_directions()
-        elif self.PHASES[self.phase] == Phase.Breakdown:
+        elif self.phase == Phase.Breakdown:
             return self.player.get_unbroken_breakdowns(self.declared_direction)
-        raise Exception("phase is not a valid phase")
+        elif self.phase == Phase.Mark_Power:
+            return self.player.get_unmarked_powers()
+        else:
+            raise Exception("phase not found")
 
 
     def next_phase(self):
@@ -73,17 +89,34 @@ class Game:
         Also changes current player to other one if its the end of the last phase.
         """
         if self.phase == Phase.Starting:
+            assert self.phase_num == None, "phase is starting but phase_num is not none"
             if self.player == self.p1:
                 self.player = self.p2
             else:
                 assert self.player == self.p2, "player is not p1 or p2 in starting phase"
-                self.phase = 0
+                self.phase_num = 0
+                self.phase = self.PHASES[self.phase_num]
                 self.player = self.p1
-        elif self.phase == len(self.PHASES)-1:
+        elif self.action_used:
+            pass
+        elif self.phase_num == len(self.PHASES)-1:
             self.player = self.p1 if self.player == self.p2 else self.p2
-            self.phase = 0
+            self.phase_num = 0
+            self.phase = self.PHASES[self.phase_num]
         else:
             self.phase += 1
+            self.phase = self.PHASES[self.phase_num]
+
+    
+    def handle_power(self, power):
+        if power == Power.Drone:
+            pass
+        elif power == Power.Silence:
+            pass
+        elif power == Power.Torpedo:
+            pass
+        else:
+            raise Exception("power not found")
 
 
 if __name__ == "__main__":
