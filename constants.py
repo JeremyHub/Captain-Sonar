@@ -8,8 +8,8 @@ class Direction(Enum):
     East = "east"
 
 DIRECTION_COORDS = { #col, row
-    Direction.North: (0,1),
-    Direction.South: (0,-1),
+    Direction.North: (0,-1),
+    Direction.South: (0,1),
     Direction.West: (-1,0),
     Direction.East: (1,0)
 }

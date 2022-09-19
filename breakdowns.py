@@ -8,6 +8,7 @@ class BreakdownChannel(Enum):
     Orange = "orange"
     Black = "black"
     Radiation = "radiation"
+    No_Channel = "none"
 
 
 class BreakdownType(Enum):
@@ -24,6 +25,9 @@ class BreakdownDot:
     direction_class: Direction
     marked: bool = False
 
+    def __repr__(self) -> str:
+        return f"{self.type.value} dot on {self.channel.value} channel, at {self.direction_class.value} direction, is {self.marked} marked."
+
 
 class BreakdownMap:
     def __init__(self):
@@ -32,7 +36,7 @@ class BreakdownMap:
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Red, Direction.West),
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Yellow, Direction.West),
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Green, Direction.West),
-            BreakdownDot(None, BreakdownType.Green, Direction.West),
+            BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Green, Direction.West),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.West),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.West),
         ]
@@ -40,23 +44,23 @@ class BreakdownMap:
             BreakdownDot(BreakdownChannel.Orange, BreakdownType.Yellow, Direction.North),
             BreakdownDot(BreakdownChannel.Orange, BreakdownType.Yellow, Direction.North),
             BreakdownDot(BreakdownChannel.Orange, BreakdownType.Red, Direction.North),
-            BreakdownDot(None, BreakdownType.Green, Direction.North),
-            BreakdownDot(None, BreakdownType.Red, Direction.North),
+            BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Green, Direction.North),
+            BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Red, Direction.North),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.North),
         ]
         self.map[Direction.South] = [
             BreakdownDot(BreakdownChannel.Black, BreakdownType.Green, Direction.West),
             BreakdownDot(BreakdownChannel.Black, BreakdownType.Yellow, Direction.West),
             BreakdownDot(BreakdownChannel.Black, BreakdownType.Red, Direction.West),
-            BreakdownDot(None, BreakdownType.Red, Direction.West),
+            BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Red, Direction.West),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.West),
-            BreakdownDot(None, BreakdownType.Yellow, Direction.West),
+            BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Yellow, Direction.West),
         ]
         self.map[Direction.East] = [
             BreakdownDot(BreakdownChannel.Orange, BreakdownType.Green, Direction.East),
             BreakdownDot(BreakdownChannel.Black, BreakdownType.Yellow, Direction.East),
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Red, Direction.East),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.East),
-            BreakdownDot(None, BreakdownType.Green, Direction.East),
+            BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Green, Direction.East),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.East),
         ]

@@ -139,7 +139,7 @@ class Sub:
 
 
     def _in_bounds(self, row, col, board):
-        return 0 < row < len(board) and 0 < col < len(board[0])
+        return 0 <= row < len(board) and 0 <= col < len(board[0])
 
 
     def _get_torpedo_options(self, board):

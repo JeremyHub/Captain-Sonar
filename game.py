@@ -48,6 +48,7 @@ class Game:
             self.player.set_starting_loc(action)
         elif self.phase == Phase.Choose_Power:
             if action is not None:
+                self.player.powers[action] = 0
                 if action == Power.Drone:
                     opponent = self.opponent
                     observation = opponent.get_quadrant(self.board) # TODO: observation
@@ -137,7 +138,7 @@ class Game:
         row, col = loc
         for p in [self.p1, self.p2]:
             if p.loc == loc:
-                p.damage += 2
+                p.damage += 1
             prow, pcol = p.loc
             if abs(prow-row) <= 1 and abs(pcol-col) <= 1:
                 p.damage += 1
@@ -145,18 +146,27 @@ class Game:
 
     @property
     def opponent(self):
-        return self.p1 if self.player == self.p1 else self.p2
+        return self.p2 if self.player == self.p1 else self.p1
 
 
 if __name__ == "__main__":
     g = Game()
+    num_games = 0
     while True:
         print("---------------------------------------")
         print(f"player: {g.player.player}")
         options = g.legal_actions()
-        print(g.phase)
-        print(options)
-        action = randint(0,len(options)-1)
-        print(action)
+        print("phase: ", g.phase)
+        print("options: ", options)
+        if len(options) > 1:
+            action = randint(1,len(options)-1)
+        else:
+            action = randint(0,len(options)-1)
+        print("action: ", action)
+        print("player: ", g.player.player)
+        print("player loc: ", g.player.loc)
+        print("remaining surface turns: ", g.player.remaining_surface_turns)
+        print("path: ", g.player.path)
         obs, reward, done = g.step(options[int(action)])
-        if done: g = Game()
+        if done:
+            g = Game()
