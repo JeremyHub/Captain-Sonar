@@ -43,7 +43,7 @@ class Game:
 
     
     def step(self, action):
-        observation, reward, done = None
+        observation, reward, done = None, None, None
         if self.phase == Phase.Starting:
             self.player.set_starting_loc(action)
         elif self.phase == Phase.Choose_Power:
@@ -112,7 +112,7 @@ class Game:
     def handle_power(self, power):
         if power == Power.Drone:
             opponent = self.p1 if self.player == self.p1 else self.p2
-            return opponent.get_quadrant()
+            return opponent.get_quadrant(self.board)
         elif power == Power.Silence:
             pass
         elif power == Power.Torpedo:
