@@ -33,7 +33,7 @@ class Sub:
             self.remaining_surface_turns -= 1
         else:
             self.path.append(self.loc)
-            self.loc = self._get_coord_in_direction(direction)
+            self.loc = self._get_coord_in_direction(self.loc, direction)
 
     
     def breakdown(self, dot, declared_direction):
@@ -53,12 +53,22 @@ class Sub:
         if power is not None:
             self.powers[power] += 1
 
+
+    def silence(self, action):
+        dir, speed = action
+        for _ in range(speed):
+            self.move(dir)
+
     
-    def get_active_powers(self):
+    def get_active_powers(self, board):
         active = [None]
         if self.remaining_surface_turns:
-            active
+            return active
         for power, marks in self.powers.items():
+            if power == Power.Silence:
+                if not self.get_valid_directions(board)[0]:
+                    # cant silence without anywhere to move to
+                    continue
             cost = POWER_COSTS[power]
             assert marks <= cost and marks >= 0, "{} on {} power".format(marks, power)
             if marks == cost:
@@ -82,18 +92,30 @@ class Sub:
         if self.remaining_surface_turns:
             return valid_directions
         for direction in Direction:
-            row,col = self._get_coord_in_direction(direction)
-            if 0 < row < len(board) and 0 < col < len(board[0]):
+            row,col = self._get_coord_in_direction(self.loc, direction)
+            if self._in_bounds(row, col, board):
                 if board[row][col] == 0 and (row,col) not in self.path:
                     valid_directions.append(direction)
         return valid_directions
 
     
-    def get_unmarked_powers(self):
+    def get_unmarked_powers(self, board):
         if self.remaining_surface_turns:
             return [None]
-        powers = [p for p in Power if p not in self.get_active_powers()]
+        powers = [p for p in Power if p not in self.get_active_powers(board)]
         return powers if powers else [None]
+
+
+    def get_power_options(self, power, board):
+        options = []
+        if power == Power.Silence:
+            options = self._get_silence_options(board)
+        elif power == Power.Torpedo:
+            options = self._get_torpedo_options()
+        else:
+            raise Exception("power not found")
+        assert options, "no options for aiming power"
+        return options
 
 
     def get_quadrant(self, board):
@@ -101,11 +123,33 @@ class Sub:
         row_half = int(self.loc[0] > len(board)-1)
         return col_half + 2*row_half
 
+
+    def _get_silence_options(self, board):
+        options = []
+        for dir in Direction:
+            loc = self.loc
+            for i in range(4):
+                row_dir, col_dir = self._get_coord_in_direction(loc, dir)
+                if self._in_bounds(row_dir, col_dir, board) and board[row_dir][col_dir] == 0 and (row_dir, col_dir) not in self.path:
+                    options.append((dir, i))
+                    loc = (row_dir, col_dir)
+                else:
+                    break
+        return options
+
+
+    def _in_bounds(self, row, col, board):
+        return 0 < row < len(board) and 0 < col < len(board[0])
+
+
+    def _get_torpedo_options(self):
+        return [(0,0)]
+
     
-    def _get_coord_in_direction(self, direction):
+    def _get_coord_in_direction(self, loc, direction):
         dir_col, dir_row = DIRECTION_COORDS[direction]
-        row = self.loc[0] + dir_row
-        col = self.loc[1] + dir_col
+        row = loc[0] + dir_row
+        col = loc[1] + dir_col
         return (row,col)
 
 

@@ -7,7 +7,7 @@ from constants import Player, Direction, ALPHA_BOARD, Power
 class Phase(Enum):
     Starting = "starting phase"
     Choose_Power = "choose power phase"
-    Aim_Powers = "aim power phase"
+    Aim_Power = "do/aim power phase"
     Movement = "movement phase"
     Breakdown = "breakdown phase"
     Mark_Power = "mark power phase"
@@ -23,7 +23,7 @@ class Game:
     phase_num: int
     board: tuple[tuple[int]]
     declared_direction: Direction
-    action_used: bool
+    power_to_aim: Power
     
 
     def __init__(self):
@@ -39,19 +39,20 @@ class Game:
         self.phase_num = None
         self.board = ALPHA_BOARD
         self.declared_direction = None
-        self.action_used = None
+        self.power_to_aim = None
 
     
     def step(self, action):
-        observation, reward, done = None, None, None
+        observation = None # TODO: think of good observation
         if self.phase == Phase.Starting:
             self.player.set_starting_loc(action)
         elif self.phase == Phase.Choose_Power:
             if action is not None:
-                self.handle_power(action)
-                self.action_used = True
-            else:
-                self.action_used = False
+                if action == Power.Drone:
+                    opponent = self.opponent
+                    observation = opponent.get_quadrant(self.board) # TODO: observation
+                else:
+                    self.power_to_aim = action
         elif self.phase == Phase.Movement:
             self.player.move(action)
             self.declared_direction = action
@@ -59,9 +60,15 @@ class Game:
             self.player.breakdown(action, self.declared_direction)
         elif self.phase == Phase.Mark_Power:
             self.player.mark(action)
+        elif self.phase == Phase.Aim_Power:
+            observation = self.handle_power(action) # TODO: observation
+            self.power_to_aim = None
         else:
             raise Exception("phase not found")
         self.next_phase()
+        reward = self.opponent.damage - self.player.damage
+        done = self.player.damage >= 4 or self.opponent.damage >= 4
+        return observation, reward, done
 
     
     def legal_actions(self):
@@ -73,13 +80,15 @@ class Game:
                         actions.append((row,col))
             return actions
         elif self.phase == Phase.Choose_Power:
-            return self.player.get_active_powers()
+            return self.player.get_active_powers(self.board)
         elif self.phase == Phase.Movement:
             return self.player.get_valid_directions(self.board)
         elif self.phase == Phase.Breakdown:
             return self.player.get_unbroken_breakdowns(self.declared_direction)
         elif self.phase == Phase.Mark_Power:
-            return self.player.get_unmarked_powers()
+            return self.player.get_unmarked_powers(self.board)
+        elif self.phase == Phase.Aim_Power:
+            return self.player.get_power_options(self.power_to_aim, self.board)
         else:
             raise Exception("phase not found")
 
@@ -98,27 +107,45 @@ class Game:
                 self.phase_num = 0
                 self.phase = self.PHASES[self.phase_num]
                 self.player = self.p1
-        elif self.action_used:
-            pass
+        elif self.power_to_aim:
+            self.phase = Phase.Aim_Power
         elif self.phase_num == len(self.PHASES)-1:
-            self.player = self.p1 if self.player == self.p2 else self.p2
+            self.player = self.opponent
             self.phase_num = 0
             self.phase = self.PHASES[self.phase_num]
         else:
             self.phase_num += 1
             self.phase = self.PHASES[self.phase_num]
 
-    
-    def handle_power(self, power):
-        if power == Power.Drone:
-            opponent = self.p1 if self.player == self.p1 else self.p2
-            return opponent.get_quadrant(self.board)
-        elif power == Power.Silence:
-            pass
+
+    def handle_power(self, action):
+        power = self.power_to_aim
+        observation = None
+        if power == Power.Silence:
+            observation = action
+            self.player.silence(action)
         elif power == Power.Torpedo:
-            pass
+            explosion_loc = action
+            observation = explosion_loc
+            self._explosion(explosion_loc)
         else:
             raise Exception("power not found")
+        return observation
+
+
+    def _explosion(self, loc):
+        row, col = loc
+        for p in [self.p1, self.p2]:
+            if p.loc == loc:
+                p.damage += 2
+            prow, pcol = p.loc
+            if abs(prow-row) <= 1 and abs(pcol-col) <= 1:
+                p.damage += 1
+
+
+    @property
+    def opponent(self):
+        return self.p1 if self.player == self.p1 else self.p2
 
 
 if __name__ == "__main__":
@@ -130,4 +157,5 @@ if __name__ == "__main__":
         print(g.phase)
         print(options)
         action = randint(0,len(options)-1)
-        g.step(options[int(action)])
+        obs, reward, done = g.step(options[int(action)])
+        if done: break
