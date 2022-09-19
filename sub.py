@@ -111,7 +111,7 @@ class Sub:
         if power == Power.Silence:
             options = self._get_silence_options(board)
         elif power == Power.Torpedo:
-            options = self._get_torpedo_options()
+            options = self._get_torpedo_options(board)
         else:
             raise Exception("power not found")
         assert options, "no options for aiming power"
@@ -142,8 +142,21 @@ class Sub:
         return 0 < row < len(board) and 0 < col < len(board[0])
 
 
-    def _get_torpedo_options(self):
-        return [(0,0)]
+    def _get_torpedo_options(self, board):
+        options = []
+        to_check = [self.loc]
+        for _ in range(4):
+            to_add = []
+            for option in to_check:
+                for dir in Direction:
+                    loc = self._get_coord_in_direction(option, dir)
+                    if loc in options:
+                        continue
+                    if self._in_bounds(loc[0], loc[1], board) and board[loc[0]][loc[1]] == 0:
+                        options.append(loc)
+                        to_add.append(loc)
+            to_check = to_add
+        return options
 
     
     def _get_coord_in_direction(self, loc, direction):

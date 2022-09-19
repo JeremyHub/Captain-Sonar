@@ -157,5 +157,6 @@ if __name__ == "__main__":
         print(g.phase)
         print(options)
         action = randint(0,len(options)-1)
+        print(action)
         obs, reward, done = g.step(options[int(action)])
-        if done: break
+        if done: g = Game()
