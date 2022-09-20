@@ -44,6 +44,20 @@ class Game:
     
     def step(self, action):
         observation = None # TODO: think of good observation
+        """Things to go in the observation:
+        your health, opponents health
+        your position
+        the phase
+        path?
+        the map
+        your breakdowns
+        your power marks
+        your opponents last action (
+            direction they last moved
+            any powers they used
+                how they aimed those powers
+        )
+        """
         if self.phase == Phase.Starting:
             self.player.set_starting_loc(action)
         elif self.phase == Phase.Choose_Power:
