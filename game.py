@@ -18,7 +18,7 @@ class Game:
 
     PHASES = [Phase.Choose_Power, Phase.Movement, Phase.Breakdown, Phase.Mark_Power, Phase.Choose_Power]
     SCREEN_HEIGHT = 800
-    SCREEN_WIDTH = 1000
+    SCREEN_WIDTH = 1500
     p1: Sub
     p2: Sub
     player: Sub
@@ -29,8 +29,6 @@ class Game:
     power_to_aim: Power
     does_draw: bool
     screen: pg.Surface
-    p1_breakdowns: pg.Surface
-    p2_breakdowns: pg.Surface
     
 
     def __init__(self, does_draw = False):
@@ -53,16 +51,21 @@ class Game:
         self.power_to_aim = None
         if self.does_draw:
             self.screen.fill((0,0,0))
-            self.set_breakdowns()
+            self.setup_breakdowns(4)
+            self.setup_powerboards(4)
 
+
+    def setup_powerboards(self, frac_of_display):
+        for height in [0, self.SCREEN_HEIGHT//2]:
+            breakdown = pg.image.load("C:/Users/jerem/Documents/GitHub/Captain-Sonar/powers.png").convert()
+            breakdown = pg.transform.scale(breakdown, (self.SCREEN_WIDTH//frac_of_display, self.SCREEN_HEIGHT//2))
+            self.screen.blit(breakdown,((self.SCREEN_WIDTH//frac_of_display)*(frac_of_display-2), height))
     
-    def set_breakdowns(self):
-        self.p1_breakdowns = pg.image.load("C:/Users/jerem/Documents/GitHub/Captain-Sonar/breakdowns.png").convert()
-        self.p1_breakdowns = pg.transform.scale(self.p1_breakdowns, (self.SCREEN_WIDTH//3, self.SCREEN_HEIGHT//2))
-        self.screen.blit(self.p1_breakdowns,((self.SCREEN_WIDTH//3)*2, 0))
-        self.p2_breakdowns = pg.image.load("C:/Users/jerem/Documents/GitHub/Captain-Sonar/breakdowns.png").convert()
-        self.p2_breakdowns = pg.transform.scale(self.p2_breakdowns, (self.SCREEN_WIDTH//3, self.SCREEN_HEIGHT//2))
-        self.screen.blit(self.p2_breakdowns,((self.SCREEN_WIDTH//3)*2, self.SCREEN_HEIGHT//2))
+    def setup_breakdowns(self, frac_of_display):
+        for height in [0, self.SCREEN_HEIGHT//2]:
+            breakdown = pg.image.load("C:/Users/jerem/Documents/GitHub/Captain-Sonar/breakdowns.png").convert()
+            breakdown = pg.transform.scale(breakdown, (self.SCREEN_WIDTH//frac_of_display, self.SCREEN_HEIGHT//2))
+            self.screen.blit(breakdown,((self.SCREEN_WIDTH//frac_of_display)*(frac_of_display-1), height))
 
     
     def step(self, action):
@@ -107,6 +110,10 @@ class Game:
         reward = self.opponent.damage - self.player.damage
         done = self.player.damage >= 4 or self.opponent.damage >= 4
         if self.does_draw:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    pg.quit()
+                    raise KeyboardInterrupt()
             pg.display.flip()
         return observation, reward, done
 
