@@ -2,6 +2,7 @@ from enum import Enum
 from random import randint
 from sub import Sub
 from constants import Player, Direction, ALPHA_BOARD, Power
+import pygame as pg
 
 
 class Phase(Enum):
@@ -16,6 +17,8 @@ class Phase(Enum):
 class Game:
 
     PHASES = [Phase.Choose_Power, Phase.Movement, Phase.Breakdown, Phase.Mark_Power, Phase.Choose_Power]
+    SCREEN_HEIGHT = 800
+    SCREEN_WIDTH = 1000
     p1: Sub
     p2: Sub
     player: Sub
@@ -24,9 +27,17 @@ class Game:
     board: tuple[tuple[int]]
     declared_direction: Direction
     power_to_aim: Power
+    does_draw: bool
+    screen: pg.Surface
+    p1_breakdowns: pg.Surface
+    p2_breakdowns: pg.Surface
     
 
-    def __init__(self):
+    def __init__(self, does_draw = False):
+        self.does_draw = does_draw
+        if self.does_draw:
+            pg.init()
+            self.screen = pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.reset()
 
 
@@ -40,6 +51,18 @@ class Game:
         self.board = ALPHA_BOARD
         self.declared_direction = None
         self.power_to_aim = None
+        if self.does_draw:
+            self.screen.fill((0,0,0))
+            self.set_breakdowns()
+
+    
+    def set_breakdowns(self):
+        self.p1_breakdowns = pg.image.load("C:/Users/jerem/Documents/GitHub/Captain-Sonar/breakdowns.png").convert()
+        self.p1_breakdowns = pg.transform.scale(self.p1_breakdowns, (self.SCREEN_WIDTH//3, self.SCREEN_HEIGHT//2))
+        self.screen.blit(self.p1_breakdowns,((self.SCREEN_WIDTH//3)*2, 0))
+        self.p2_breakdowns = pg.image.load("C:/Users/jerem/Documents/GitHub/Captain-Sonar/breakdowns.png").convert()
+        self.p2_breakdowns = pg.transform.scale(self.p2_breakdowns, (self.SCREEN_WIDTH//3, self.SCREEN_HEIGHT//2))
+        self.screen.blit(self.p2_breakdowns,((self.SCREEN_WIDTH//3)*2, self.SCREEN_HEIGHT//2))
 
     
     def step(self, action):
@@ -83,6 +106,8 @@ class Game:
         self.next_phase()
         reward = self.opponent.damage - self.player.damage
         done = self.player.damage >= 4 or self.opponent.damage >= 4
+        if self.does_draw:
+            pg.display.flip()
         return observation, reward, done
 
     
@@ -164,23 +189,26 @@ class Game:
 
 
 if __name__ == "__main__":
-    g = Game()
+    g = Game(True)
     num_games = 0
-    while True:
-        print("---------------------------------------")
-        print(f"player: {g.player.player}")
-        options = g.legal_actions()
-        print("phase: ", g.phase)
-        print("options: ", options)
-        if len(options) > 1:
-            action = randint(1,len(options)-1)
-        else:
-            action = randint(0,len(options)-1)
-        print("action: ", action)
-        print("player: ", g.player.player)
-        print("player loc: ", g.player.loc)
-        print("remaining surface turns: ", g.player.remaining_surface_turns)
-        print("path: ", g.player.path)
-        obs, reward, done = g.step(options[int(action)])
-        if done:
-            g = Game()
+    try:
+        while True:
+            print("---------------------------------------")
+            print(f"player: {g.player.player}")
+            options = g.legal_actions()
+            print("phase: ", g.phase)
+            print("options: ", options)
+            if len(options) > 1:
+                action = randint(1,len(options)-1)
+            else:
+                action = randint(0,len(options)-1)
+            print("action: ", action)
+            print("player: ", g.player.player)
+            print("player loc: ", g.player.loc)
+            print("remaining surface turns: ", g.player.remaining_surface_turns)
+            print("path: ", g.player.path)
+            obs, reward, done = g.step(options[int(action)])
+            if done:
+                g = Game(True)
+    finally:
+        pg.quit()
