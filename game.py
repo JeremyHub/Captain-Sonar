@@ -19,6 +19,7 @@ class Game:
     PHASES = [Phase.Choose_Power, Phase.Movement, Phase.Breakdown, Phase.Mark_Power, Phase.Choose_Power]
     SCREEN_HEIGHT = 800
     SCREEN_WIDTH = 1500
+    BOARD_FRAC_OF_DISPLAY = 4
     p1: Sub
     p2: Sub
     player: Sub
@@ -51,21 +52,22 @@ class Game:
         self.power_to_aim = None
         if self.does_draw:
             self.screen.fill((0,0,0))
-            self.setup_breakdowns(4)
-            self.setup_powerboards(4)
+            self.setup_boards("C:/Users/jerem/Documents/GitHub/Captain-Sonar/powers.png", 2)
+            self.setup_boards("C:/Users/jerem/Documents/GitHub/Captain-Sonar/breakdowns.png", 1)
+            self.setup_map("C:/Users/jerem/Documents/GitHub/Captain-Sonar/alpha_map.png")
 
 
-    def setup_powerboards(self, frac_of_display):
-        for height in [0, self.SCREEN_HEIGHT//2]:
-            breakdown = pg.image.load("C:/Users/jerem/Documents/GitHub/Captain-Sonar/powers.png").convert()
-            breakdown = pg.transform.scale(breakdown, (self.SCREEN_WIDTH//frac_of_display, self.SCREEN_HEIGHT//2))
-            self.screen.blit(breakdown,((self.SCREEN_WIDTH//frac_of_display)*(frac_of_display-2), height))
+    def setup_map(self, path):
+        board = pg.image.load(path).convert()
+        board = pg.transform.scale(board, (self.SCREEN_WIDTH//(self.BOARD_FRAC_OF_DISPLAY//2), self.SCREEN_HEIGHT))
+        self.screen.blit(board, (0,0))
     
-    def setup_breakdowns(self, frac_of_display):
+
+    def setup_boards(self, path, number):
         for height in [0, self.SCREEN_HEIGHT//2]:
-            breakdown = pg.image.load("C:/Users/jerem/Documents/GitHub/Captain-Sonar/breakdowns.png").convert()
-            breakdown = pg.transform.scale(breakdown, (self.SCREEN_WIDTH//frac_of_display, self.SCREEN_HEIGHT//2))
-            self.screen.blit(breakdown,((self.SCREEN_WIDTH//frac_of_display)*(frac_of_display-1), height))
+            breakdown = pg.image.load(path).convert()
+            breakdown = pg.transform.scale(breakdown, (self.SCREEN_WIDTH//self.BOARD_FRAC_OF_DISPLAY, self.SCREEN_HEIGHT//2))
+            self.screen.blit(breakdown,((self.SCREEN_WIDTH//self.BOARD_FRAC_OF_DISPLAY)*(self.BOARD_FRAC_OF_DISPLAY-number), height))
 
     
     def step(self, action):
