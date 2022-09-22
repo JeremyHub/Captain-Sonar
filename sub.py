@@ -39,7 +39,7 @@ class Sub:
     def breakdown(self, dot, declared_direction):
         if declared_direction is None: # surfacing
             return
-        for breakdown in self.breakdownMap.map[declared_direction]:
+        for breakdown in self.breakdownMap.direction_map[declared_direction]:
             if breakdown == dot:
                 assert not breakdown.marked, "trying to disable already marked breakdown"
                 breakdown.marked = True
@@ -80,7 +80,7 @@ class Sub:
         if direction is None: # surfacing
             return [None]
         options = []
-        for breakdown in self.breakdownMap.map[direction]:
+        for breakdown in self.breakdownMap.direction_map[direction]:
             if not breakdown.marked:
                 options.append(breakdown)
         assert options, "all breakdowns are marked"
@@ -168,32 +168,20 @@ class Sub:
 
     def _check_breakdown_clearing(self):
         # check for damage if all on one direction are broken
-        for breakdowns in self.breakdownMap.map.values():
-            for breakdown in breakdowns:
-                if not breakdown.marked:
-                    break
-            else: # if above loop does not break
+        # or damage for radiation
+        # or clearing all on one channel
+        for breakdown_map in [self.breakdownMap.direction_map.items(),self.breakdownMap.channel_map.items()]:
+            for channel_or_direction, breakdowns in breakdown_map:
                 for breakdown in breakdowns:
-                    breakdown.marked = False
-                    self.damage += 1
-        # check for the channels and radiation
-        any_unmarked_in_channels = {
-            BreakdownChannel.Yellow: False,
-            BreakdownChannel.Orange: False,
-            BreakdownChannel.Black: False,
-            BreakdownChannel.Radiation: False,
-        }
-        for breakdown in [b for bl in self.breakdownMap.map.values() for b in bl]:
-            if not breakdown.marked:
-                any_unmarked_in_channels[breakdown.channel] = True
-        for channel, any_unmarked in any_unmarked_in_channels.items():
-            if not any_unmarked:
-                if channel == BreakdownChannel.Radiation:
-                    self.damage += 1
-                for breakdown in [b for bl in self.breakdownMap.map.values() for b in bl]:
-                    if breakdown.channel == channel:
-                        assert breakdown.marked, "channel was all marked, but one of the dots is not"
+                    if not breakdown.marked:
+                        break
+                else: # if above loop does not break
+                    for breakdown in breakdowns:
                         breakdown.marked = False
+                    if type(channel_or_direction) == Direction:
+                        self.damage += 1
+                    if channel_or_direction == BreakdownChannel.Radiation:
+                        self.damage += 1
 
     
     def _surface(self):

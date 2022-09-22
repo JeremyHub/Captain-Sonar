@@ -116,6 +116,7 @@ class Game:
                 if event.type == pg.QUIT:
                     pg.quit()
                     raise KeyboardInterrupt()
+            self.update_display()
             pg.display.flip()
         return observation, reward, done
 
@@ -140,6 +141,14 @@ class Game:
             return self.player.get_power_options(self.power_to_aim, self.board)
         else:
             raise Exception("phase not found")
+
+
+    def update_display(self):
+        # update breakdowns
+        # update powers
+        # update positions of subs
+        # update paths of subs
+        pass
 
 
     def next_phase(self):
@@ -168,6 +177,7 @@ class Game:
 
 
     def handle_power(self, action):
+        # TODO: draw powers to screen
         power = self.power_to_aim
         observation = None
         if power == Power.Silence:

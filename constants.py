@@ -47,3 +47,11 @@ ALPHA_BOARD = (
     (0,0,1,0,0,0,1,0,1,0,0,0,0,1,0), # 14
     (0,0,0,1,0,0,0,0,0,0,0,0,0,0,0), # 15
 )
+
+SCREEN_LOCS = {
+    Power: {
+        Power.Silence: lambda size: size*2,
+        Power.Drone: lambda size: size*2,
+        Power.Torpedo: lambda size: size*2,
+    }
+}
