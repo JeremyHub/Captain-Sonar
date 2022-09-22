@@ -136,7 +136,7 @@ class Game:
         elif self.phase == Phase.Breakdown:
             return self.player.get_unbroken_breakdowns(self.declared_direction)
         elif self.phase == Phase.Mark_Power:
-            return self.player.get_unmarked_powers(self.board)
+            return self.player.get_unmarked_powers()
         elif self.phase == Phase.Aim_Power:
             return self.player.get_power_options(self.power_to_aim, self.board)
         else:

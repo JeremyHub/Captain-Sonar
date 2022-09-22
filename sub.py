@@ -1,5 +1,5 @@
 from constants import DIRECTION_COORDS, Power, Direction, Player, POWER_COSTS, DIRECTION_COORDS
-from breakdowns import BreakdownMap, BreakdownChannel, BreakdownType
+from breakdowns import BreakdownMap, BreakdownChannel, POWER_TO_BREAKDOWN_TYPE
 
 
 class Sub:
@@ -66,13 +66,17 @@ class Sub:
             return active
         for power, marks in self.powers.items():
             if power == Power.Silence:
-                if not self.get_valid_directions(board)[0]:
+                if len(self.get_valid_directions(board)) == 1:
                     # cant silence without anywhere to move to
                     continue
             cost = POWER_COSTS[power]
             assert marks <= cost and marks >= 0, "{} on {} power".format(marks, power)
             if marks == cost:
-                active.append(power)
+                for breakdown in self.breakdownMap.type_map[POWER_TO_BREAKDOWN_TYPE[power]]:
+                    if breakdown.marked:
+                        break
+                else: # if above for loop does not break
+                    active.append(power)
         return active
 
 
@@ -99,10 +103,10 @@ class Sub:
         return valid_directions
 
     
-    def get_unmarked_powers(self, board):
+    def get_unmarked_powers(self):
         if self.remaining_surface_turns:
             return [None]
-        powers = [p for p in Power if p not in self.get_active_powers(board)]
+        powers = [p for p in Power if POWER_COSTS[p] == self.powers[p]]
         return powers if powers else [None]
 
 
