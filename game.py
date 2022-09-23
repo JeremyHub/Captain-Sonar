@@ -106,10 +106,9 @@ class Game:
         your health, opponents health
         your position
         the phase
-        path?
-        the map
-        your breakdowns
-        your power marks
+        the map??
+        your breakdowns?
+        your power marks??
         your opponents last action (
             direction they last moved
             any powers they used
