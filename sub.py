@@ -9,10 +9,12 @@ class Sub:
     powers: dict[Power, int]
     player: Player
     remaining_surface_turns: int
+    board: list[list[int]]
 
 
-    def __init__(self, player: Player):
+    def __init__(self, player: Player, board: list[list[int]]):
         self.player = player
+        self.board = board
         self.loc = None
         self.path = []
         self.breakdownMap = BreakdownMap()
@@ -34,6 +36,7 @@ class Sub:
         else:
             self.path.append(self.loc)
             self.loc = self._get_coord_in_direction(self.loc, direction)
+        assert self.board[self.loc[0]][self.loc[1]] == 0, "trying to move to an island"
 
     
     def breakdown(self, dot, declared_direction):
@@ -60,13 +63,13 @@ class Sub:
             self.move(dir)
 
     
-    def get_active_powers(self, board):
+    def get_active_powers(self):
         active = [None]
         if self.remaining_surface_turns:
             return active
         for power, marks in self.powers.items():
             if power == Power.Silence:
-                if len(self.get_valid_directions(board)) == 1:
+                if len(self.get_valid_directions()) == 1:
                     # cant silence without anywhere to move to
                     continue
             cost = POWER_COSTS[power]
@@ -91,14 +94,14 @@ class Sub:
         return options
 
 
-    def get_valid_directions(self, board):
+    def get_valid_directions(self):
         valid_directions = [None]
         if self.remaining_surface_turns:
             return valid_directions
         for direction in Direction:
             row,col = self._get_coord_in_direction(self.loc, direction)
-            if self._in_bounds(row, col, board):
-                if board[row][col] == 0 and (row,col) not in self.path:
+            if self._in_bounds(row, col):
+                if self.board[row][col] == 0 and (row,col) not in self.path:
                     valid_directions.append(direction)
         return valid_directions
 
@@ -110,31 +113,31 @@ class Sub:
         return powers if powers else [None]
 
 
-    def get_power_options(self, power, board):
+    def get_power_options(self, power):
         options = []
         if power == Power.Silence:
-            options = self._get_silence_options(board)
+            options = self._get_silence_options()
         elif power == Power.Torpedo:
-            options = self._get_torpedo_options(board)
+            options = self._get_torpedo_options()
         else:
             raise Exception("power not found")
         assert options, "no options for aiming power"
         return options
 
 
-    def get_quadrant(self, board):
-        col_half = int(self.loc[1] > len(board[0])-1)
-        row_half = int(self.loc[0] > len(board)-1)
+    def get_quadrant(self):
+        col_half = int(self.loc[1] > len(self.board[0])-1)
+        row_half = int(self.loc[0] > len(self.board)-1)
         return col_half + 2*row_half
 
 
-    def _get_silence_options(self, board):
+    def _get_silence_options(self):
         options = []
         for dir in Direction:
             loc = self.loc
             for i in range(4):
                 row_dir, col_dir = self._get_coord_in_direction(loc, dir)
-                if self._in_bounds(row_dir, col_dir, board) and board[row_dir][col_dir] == 0 and (row_dir, col_dir) not in self.path:
+                if self._in_bounds(row_dir, col_dir) and self.board[row_dir][col_dir] == 0 and (row_dir, col_dir) not in self.path:
                     options.append((dir, i))
                     loc = (row_dir, col_dir)
                 else:
@@ -142,11 +145,11 @@ class Sub:
         return options
 
 
-    def _in_bounds(self, row, col, board):
-        return 0 <= row < len(board) and 0 <= col < len(board[0])
+    def _in_bounds(self, row, col):
+        return 0 <= row < len(self.board) and 0 <= col < len(self.board[0])
 
 
-    def _get_torpedo_options(self, board):
+    def _get_torpedo_options(self):
         options = []
         to_check = [self.loc]
         for _ in range(4):
@@ -156,7 +159,7 @@ class Sub:
                     loc = self._get_coord_in_direction(option, dir)
                     if loc in options:
                         continue
-                    if self._in_bounds(loc[0], loc[1], board) and board[loc[0]][loc[1]] == 0:
+                    if self._in_bounds(loc[0], loc[1]) and self.board[loc[0]][loc[1]] == 0:
                         options.append(loc)
                         to_add.append(loc)
             to_check = to_add
@@ -174,7 +177,7 @@ class Sub:
         # check for damage if all on one direction are broken
         # or damage for radiation
         # or clearing all on one channel
-        for breakdown_map in [self.breakdownMap.direction_map.items(),self.breakdownMap.channel_map.items()]:
+        for breakdown_map in [self.breakdownMap.direction_map.items(), self.breakdownMap.channel_map.items()]:
             for channel_or_direction, breakdowns in breakdown_map:
                 for breakdown in breakdowns:
                     if not breakdown.marked:
