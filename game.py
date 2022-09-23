@@ -241,7 +241,7 @@ class Game:
     def _pg_update_damage(self):
         for damage, height, color in [(self.p1.damage, 0, self.P1_COLOR), (self.p2.damage, self.SCREEN_HEIGHT/2, self.P2_COLOR)]:
             x = self._get_secondary_board_x(BoardNumDisplay.Powers)*1.349
-            for i in range(damage):
+            for _ in range(damage):
                 rec = pg.Rect(x, height+self.SCREEN_HEIGHT*0.068, self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
                 x += rec.width + self.SCREEN_WIDTH*0.005
                 pg.draw.rect(self.screen, color, rec)
@@ -252,9 +252,21 @@ class Game:
 
 
     def _pg_update_powers(self):
-        for player, color in [(self.p1, self.P1_COLOR), (self.p2, self.P2_COLOR)]:
+        # location out of the powers
+        power_locs = {
+            Power.Silence: (0,1),
+            Power.Drone: (1,1),
+            Power.Torpedo: (1,0),
+        }
+        x = lambda x: self._get_secondary_board_x(BoardNumDisplay.Powers) + self.SCREEN_WIDTH*0.05 + self.SCREEN_WIDTH*x*0
+        y = lambda y: self.SCREEN_HEIGHT*y + self.SCREEN_HEIGHT*0.12
+        mark_locs = {
+            1: lambda x,y: (x*0.1, y*0.1),
+        }
+        for player, color, height in [(self.p1, self.P1_COLOR, 0), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT/2)]:
             for power, marks in player.powers.items():
-                pass
+                rec = pg.Rect(x(power_locs[power][0]), y(power_locs[power][1])+height, self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
+                pg.draw.rect(self.screen, color, rec)
 
 
 if __name__ == "__main__":
