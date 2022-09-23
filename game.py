@@ -6,12 +6,12 @@ import pygame as pg
 
 
 class Phase(Enum):
-    Starting = "starting phase"
-    Choose_Power = "choose power phase"
-    Aim_Power = "do/aim power phase"
-    Movement = "movement phase"
-    Breakdown = "breakdown phase"
-    Mark_Power = "mark power phase"
+    Starting = 1
+    Choose_Power = 2
+    Aim_Power = 3
+    Movement = 4
+    Breakdown = 5
+    Mark_Power = 6
 
 
 class BoardNumDisplay(Enum):
@@ -37,6 +37,8 @@ class Game:
     power_to_aim: Power
     does_draw: bool
     screen: pg.Surface
+    p1_last_actions: list
+    p2_last_actions: list
     
 
     def __init__(self, does_draw = False):
@@ -62,6 +64,8 @@ class Game:
         self.phase_num = None
         self.declared_direction = None
         self.power_to_aim = None
+        self.p1_last_actions = []
+        self.p2_last_actions = []
         if self.does_draw:
             self.draw_all_boards()
 
@@ -101,20 +105,6 @@ class Game:
 
     
     def step(self, action):
-        observation = None # TODO: think of good observation
-        """Things to go in the observation:
-        your health, opponents health
-        your position
-        the phase
-        the map??
-        your breakdowns?
-        your power marks??
-        your opponents last action (
-            direction they last moved
-            any powers they used
-                how they aimed those powers
-        )
-        """
         if self.phase == Phase.Starting:
             self.player.set_starting_loc(action)
         elif self.phase == Phase.Choose_Power:
@@ -137,7 +127,13 @@ class Game:
             self.power_to_aim = None
         else:
             raise Exception("phase not found")
+        if self.player == self.p1:
+            self.p1_last_actions.append(action)
+        else:
+            assert self.player == self.p2, "player is not p1 or p2"
+            self.p2_last_actions.append(action)
         self.next_phase()
+        observation = self._get_observation()
         reward = self.opponent.damage - self.player.damage
         done = self.player.damage >= 4 or self.opponent.damage >= 4
         if self.does_draw:
@@ -147,6 +143,32 @@ class Game:
                     raise KeyboardInterrupt()
             self.update_display()
         return observation, reward, done
+
+    
+    def _get_observation(self):
+        """Things to go in the observation:
+        the map??
+        your breakdowns?
+        your power marks??
+        your opponents last action (
+            direction they last moved
+            any powers they used
+                how they aimed those powers
+        )
+        """
+        observation = [
+            self.player.damage,
+            self.opponent.damage,
+            self.player.loc[0],
+            self.player.loc[1],
+            self.phase.value,
+        ]
+        if self.player == self.p1:
+            observation += self.p2_last_actions
+        else:
+            assert self.player == self.p2, "player not p1 or p2"
+            observation += self.p1_last_actions
+        return observation
 
     
     def legal_actions(self):
@@ -188,6 +210,11 @@ class Game:
         elif self.power_to_aim:
             self.phase = Phase.Aim_Power
         elif self.phase_num == len(self.PHASES)-1:
+            if self.player == self.p1:
+                self.p2_last_actions = []
+            else:
+                assert self.player == self.p2, "player is not p1 or p2"
+                self.p1_last_actions = []
             self.player = self.opponent
             self.phase_num = 0
             self.phase = self.PHASES[self.phase_num]
