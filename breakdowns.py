@@ -39,24 +39,28 @@ class BreakdownDot:
 class BreakdownMap:
     def __init__(self):
         self.all_breakdowns = [
+            # this list in order of appearence from left to right on the board (important for drawing)
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Red, Direction.West),
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Yellow, Direction.West),
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Green, Direction.West),
             BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Green, Direction.West),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.West),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.West),
-            BreakdownDot(BreakdownChannel.Orange, BreakdownType.Yellow, Direction.North),
+
             BreakdownDot(BreakdownChannel.Orange, BreakdownType.Yellow, Direction.North),
             BreakdownDot(BreakdownChannel.Orange, BreakdownType.Red, Direction.North),
+            BreakdownDot(BreakdownChannel.Orange, BreakdownType.Yellow, Direction.North),
             BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Green, Direction.North),
             BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Red, Direction.North),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.North),
+
             BreakdownDot(BreakdownChannel.Black, BreakdownType.Green, Direction.South),
             BreakdownDot(BreakdownChannel.Black, BreakdownType.Yellow, Direction.South),
             BreakdownDot(BreakdownChannel.Black, BreakdownType.Red, Direction.South),
             BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Red, Direction.South),
             BreakdownDot(BreakdownChannel.Radiation, BreakdownType.Radiation, Direction.South),
             BreakdownDot(BreakdownChannel.No_Channel, BreakdownType.Yellow, Direction.South),
+
             BreakdownDot(BreakdownChannel.Orange, BreakdownType.Green, Direction.East),
             BreakdownDot(BreakdownChannel.Black, BreakdownType.Yellow, Direction.East),
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Red, Direction.East),

@@ -248,7 +248,32 @@ class Game:
 
 
     def _pg_update_breakdowns(self):
-        pass
+        direction_locs = {
+            Direction.West: 0,
+            Direction.North: 1,
+            Direction.South: 2,
+            Direction.East: 3
+        }
+        direction_layouts = {
+            # row, col where each breakdown is within the direction
+            Direction.West: ((0,0),(0,2),(1,2),(2,0),(2,1),(2,2)),
+            Direction.North: ((0,0),(1,0),(1,2),(2,0),(2,1),(2,2)),
+            Direction.South: ((0,0),(1,0),(1,2),(2,0),(2,1),(2,2)),
+            Direction.East: ((0,0),(1,0),(1,2),(2,0),(2,1),(2,2))
+        }
+        x = lambda dir: self._get_secondary_board_x(BoardNumDisplay.Breakdowns) + self.SCREEN_WIDTH*direction_locs[dir]*0.0496 + self.SCREEN_WIDTH*0.0335
+        for player, color, height in [(self.p1, self.P1_COLOR, 0), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT/2)]:
+            num_in_class = 0
+            prev_dir = None
+            for breakdown in player.breakdownMap.all_breakdowns:
+                dir = breakdown.direction_class
+                if not prev_dir == dir:
+                    prev_dir = dir
+                    num_in_class = 0
+                if breakdown.marked:
+                    rec = pg.Rect(x(dir)+(direction_layouts[dir][num_in_class][1]*self.SCREEN_WIDTH*0.014), self.SCREEN_HEIGHT*0.285+height+(0.049*self.SCREEN_HEIGHT*direction_layouts[dir][num_in_class][0]), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
+                    pg.draw.rect(self.screen, color, rec)
+                num_in_class += 1
 
 
     def _pg_update_powers(self):
@@ -278,7 +303,8 @@ class Game:
 
 
 if __name__ == "__main__":
-    g = Game(True)
+    does_draw = True
+    g = Game(does_draw)
     num_games = 0
     try:
         while True:
@@ -298,6 +324,6 @@ if __name__ == "__main__":
             # print("path: ", g.player.path)
             obs, reward, done = g.step(options[int(action)])
             if done:
-                g = Game(True)
+                g = Game(does_draw)
     finally:
         pg.quit()
