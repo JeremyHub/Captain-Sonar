@@ -325,5 +325,7 @@ if __name__ == "__main__":
             obs, reward, done = g.step(options[int(action)])
             if done:
                 g = Game(does_draw)
+                num_games += 1
     finally:
+        print(num_games)
         pg.quit()
