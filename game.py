@@ -254,19 +254,28 @@ class Game:
     def _pg_update_powers(self):
         # location out of the powers
         power_locs = {
-            Power.Silence: (0,1),
-            Power.Drone: (1,1),
-            Power.Torpedo: (1,0),
+            Power.Silence: (2,0),
+            Power.Drone: (1,0),
+            Power.Torpedo: (0,1),
         }
-        x = lambda x: self._get_secondary_board_x(BoardNumDisplay.Powers) + self.SCREEN_WIDTH*0.05 + self.SCREEN_WIDTH*x*0
-        y = lambda y: self.SCREEN_HEIGHT*y + self.SCREEN_HEIGHT*0.12
-        mark_locs = {
-            1: lambda x,y: (x*0.1, y*0.1),
+        x = lambda x: self._get_secondary_board_x(BoardNumDisplay.Powers) + self.SCREEN_WIDTH*0.052 + self.SCREEN_WIDTH*x*0.074
+        y = lambda y: self.SCREEN_HEIGHT*y*0.18 + self.SCREEN_HEIGHT*0.125
+        mark_offsets = {
+            1: (0,0),
+            2: (0.01, 0.027),
+            3: (0.01, 0.063),
+            4: (0, 0.088),
+            5: (-0.014, 0.088),
+            6: ()
         }
         for player, color, height in [(self.p1, self.P1_COLOR, 0), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT/2)]:
             for power, marks in player.powers.items():
-                rec = pg.Rect(x(power_locs[power][0]), y(power_locs[power][1])+height, self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
-                pg.draw.rect(self.screen, color, rec)
+                assert marks <= 6, "cant have more than 6 marks on one power"
+                marks = 5
+                for offset_num in range(1,marks+1,1):
+                    x_offset_frac, y_offset_frac = mark_offsets[offset_num]
+                    rec = pg.Rect(x(power_locs[power][0])+(x_offset_frac*self.SCREEN_WIDTH), y(power_locs[power][1])+height+(y_offset_frac*self.SCREEN_HEIGHT), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
+                    pg.draw.rect(self.screen, color, rec)
 
 
 if __name__ == "__main__":
@@ -274,20 +283,20 @@ if __name__ == "__main__":
     num_games = 0
     try:
         while True:
-            print("---------------------------------------")
-            print(f"player: {g.player.player}")
+            # print("---------------------------------------")
+            # print(f"player: {g.player.player}")
             options = g.legal_actions()
-            print("phase: ", g.phase)
-            print("options: ", options)
+            # print("phase: ", g.phase)
+            # print("options: ", options)
             if len(options) > 1:
                 action = randint(1,len(options)-1)
             else:
                 action = randint(0,len(options)-1)
-            print("action: ", action)
-            print("player: ", g.player.player)
-            print("player loc: ", g.player.loc)
-            print("remaining surface turns: ", g.player.remaining_surface_turns)
-            print("path: ", g.player.path)
+            # print("action: ", action)
+            # print("player: ", g.player.player)
+            # print("player loc: ", g.player.loc)
+            # print("remaining surface turns: ", g.player.remaining_surface_turns)
+            # print("path: ", g.player.path)
             obs, reward, done = g.step(options[int(action)])
             if done:
                 g = Game(True)
