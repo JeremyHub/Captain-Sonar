@@ -226,14 +226,15 @@ class Game:
     def _pg_update_player_pos_and_path(self):
         x = lambda x: self.SCREEN_WIDTH/23 + x*self.SCREEN_WIDTH/49.7
         y = lambda y: self.SCREEN_HEIGHT/6.1 + y*self.SCREEN_HEIGHT/18.7
-        for player, color in [(self.p1, self.P1_COLOR), (self.p2, self.P2_COLOR)]:
+        l = [(self.p1, self.P1_COLOR, 0), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT*0.008)]
+        for player, color, offset in l:
             if player.loc:
-                rec = pg.Rect(x(player.loc[1]), y(player.loc[0]), self.SCREEN_WIDTH/80, self.SCREEN_HEIGHT/40)
+                rec = pg.Rect(x(player.loc[1])+offset, y(player.loc[0])+offset, self.SCREEN_WIDTH/80, self.SCREEN_HEIGHT/40)
                 pg.draw.rect(self.screen, color, rec)
         # update paths of subs
-        for player, color in [(self.p1, self.P1_COLOR), (self.p2, self.P2_COLOR)]:
+        for player, color, offset in l:
             for row, col in player.path:
-                rec = pg.Rect(x(col), y(row), self.SCREEN_WIDTH/160, self.SCREEN_HEIGHT/80)
+                rec = pg.Rect(x(col)+offset, y(row)+offset, self.SCREEN_WIDTH/160, self.SCREEN_HEIGHT/80)
                 pg.draw.rect(self.screen, color, rec)
 
 
