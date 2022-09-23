@@ -312,7 +312,7 @@ if __name__ == "__main__":
             options = g.legal_actions()
             # print("phase: ", g.phase)
             # print("options: ", options)
-            if len(options) > 1:
+            if len(options) > 1 and g.phase in [Phase.Movement, Phase.Choose_Power]:
                 action = randint(1,len(options)-1)
             else:
                 action = randint(0,len(options)-1)
