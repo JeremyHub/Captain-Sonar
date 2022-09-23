@@ -266,12 +266,11 @@ class Game:
             3: (0.01, 0.063),
             4: (0, 0.088),
             5: (-0.014, 0.088),
-            6: ()
+            6: (-0.025, 0.063)
         }
         for player, color, height in [(self.p1, self.P1_COLOR, 0), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT/2)]:
             for power, marks in player.powers.items():
                 assert marks <= 6, "cant have more than 6 marks on one power"
-                marks = 5
                 for offset_num in range(1,marks+1,1):
                     x_offset_frac, y_offset_frac = mark_offsets[offset_num]
                     rec = pg.Rect(x(power_locs[power][0])+(x_offset_frac*self.SCREEN_WIDTH), y(power_locs[power][1])+height+(y_offset_frac*self.SCREEN_HEIGHT), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)

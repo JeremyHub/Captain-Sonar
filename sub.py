@@ -109,7 +109,7 @@ class Sub:
     def get_unmarked_powers(self):
         if self.remaining_surface_turns:
             return [None]
-        powers = [p for p in Power if POWER_COSTS[p] == self.powers[p]]
+        powers = [p for p in Power if POWER_COSTS[p] > self.powers[p]]
         return powers if powers else [None]
 
 
