@@ -123,11 +123,11 @@ class Game:
         else:
             raise Exception("phase not found")
         if not self.phase in [Phase.Starting, Phase.Breakdown, Phase.Mark_Power]:
-            self.opponent.last_actions.append(action)
+            self.player.last_actions.append(action)
         reward = self.opponent.damage - self.player.damage
         observation = self._get_observation()
         done = self.player.damage >= 4 or self.opponent.damage >= 4
-        self.next_phase() # TODO: think about where this should be (relative to obs and reward)
+        self.next_phase()
         if self.does_draw:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -198,16 +198,18 @@ class Game:
             assert self.phase_num == None, "phase is starting but phase_num is not none"
             if self.player == self.p1:
                 self.player = self.p2
+                self.player.last_actions = []
             else:
                 assert self.player == self.p2, "player is not p1 or p2 in starting phase"
                 self.phase_num = 0
                 self.phase = self.PHASES[self.phase_num]
                 self.player = self.p1
+                self.player.last_actions = []
         elif self.power_to_aim:
             self.phase = Phase.Aim_Power
         elif self.phase_num == len(self.PHASES)-1:
-            self.opponent.last_actions = [] # TODO: think if this is correct or if it should be player
             self.player = self.opponent
+            self.player.last_actions = []
             self.phase_num = 0
             self.phase = self.PHASES[self.phase_num]
         else:
@@ -330,6 +332,7 @@ if __name__ == "__main__":
                 action = randint(1,len(options)-1)
             else:
                 action = randint(0,len(options)-1)
+            print("action: ", action)
             obs, reward, done = g.step(options[int(action)])
             print("obs: ", obs)
             print("reward: ", reward)
