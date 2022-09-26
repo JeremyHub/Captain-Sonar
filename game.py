@@ -37,8 +37,6 @@ class Game:
     power_to_aim: Power
     does_draw: bool
     screen: pg.Surface
-    p1_last_actions: list
-    p2_last_actions: list
     
 
     def __init__(self, does_draw = False):
@@ -64,8 +62,6 @@ class Game:
         self.phase_num = None
         self.declared_direction = None
         self.power_to_aim = None
-        self.p1_last_actions = []
-        self.p2_last_actions = []
         if self.does_draw:
             self.draw_all_boards()
 
@@ -111,8 +107,7 @@ class Game:
             if action is not None:
                 self.player.powers[action] = 0
                 if action == Power.Drone:
-                    opponent = self.opponent
-                    observation = opponent.get_quadrant() # TODO: observation
+                    observation = self.opponent.get_quadrant() # TODO: make this consistent with constant length observation
                 else:
                     self.power_to_aim = action
         elif self.phase == Phase.Movement:
@@ -123,19 +118,16 @@ class Game:
         elif self.phase == Phase.Mark_Power:
             self.player.mark(action)
         elif self.phase == Phase.Aim_Power:
-            observation = self.handle_power(action) # TODO: observation
+            self.handle_power(action)
             self.power_to_aim = None
         else:
             raise Exception("phase not found")
-        if self.player == self.p1:
-            self.p1_last_actions.append(action)
-        else:
-            assert self.player == self.p2, "player is not p1 or p2"
-            self.p2_last_actions.append(action)
-        self.next_phase()
-        observation = self._get_observation()
+        if not self.phase in [Phase.Starting, Phase.Breakdown, Phase.Mark_Power]:
+            self.opponent.last_actions.append(action)
         reward = self.opponent.damage - self.player.damage
+        observation = self._get_observation()
         done = self.player.damage >= 4 or self.opponent.damage >= 4
+        self.next_phase() # TODO: think about where this should be (relative to obs and reward)
         if self.does_draw:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
@@ -156,8 +148,6 @@ class Game:
         current phase num
         your breakdowns
         all actions opponent used on their last turn
-        # TODO: dont add certain things to last_actions
-            like starting pos, breakdown, power mark
 
         maybe to add:
         your power marks??
@@ -173,11 +163,7 @@ class Game:
         for breakdown in self.player.breakdownMap.all_breakdowns:
             representation = int(breakdown.__repr__())
             observation.append(int(representation))
-        if self.player == self.p1:
-            observation += self.p2_last_actions
-        else:
-            assert self.player == self.p2, "player not p1 or p2"
-            observation += self.p1_last_actions
+        observation += self.opponent.last_actions
         return observation
 
     
@@ -220,11 +206,7 @@ class Game:
         elif self.power_to_aim:
             self.phase = Phase.Aim_Power
         elif self.phase_num == len(self.PHASES)-1:
-            if self.player == self.p1:
-                self.p2_last_actions = []
-            else:
-                assert self.player == self.p2, "player is not p1 or p2"
-                self.p1_last_actions = []
+            self.opponent.last_actions = [] # TODO: think if this is correct or if it should be player
             self.player = self.opponent
             self.phase_num = 0
             self.phase = self.PHASES[self.phase_num]
@@ -236,17 +218,13 @@ class Game:
     def handle_power(self, action):
         # TODO: draw powers to screen
         power = self.power_to_aim
-        observation = None
         if power == Power.Silence:
-            observation = action
             self.player.silence(action)
         elif power == Power.Torpedo:
             explosion_loc = action
-            observation = explosion_loc
             self._explosion(explosion_loc)
         else:
             raise Exception("power not found")
-        return observation
 
 
     def _explosion(self, loc):

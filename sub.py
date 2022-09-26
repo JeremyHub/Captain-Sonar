@@ -1,3 +1,4 @@
+from typing import Any
 from constants import DIRECTION_COORDS, Power, Direction, Player, POWER_COSTS, DIRECTION_COORDS
 from breakdowns import BreakdownMap, BreakdownChannel, POWER_TO_BREAKDOWN_TYPE
 
@@ -10,6 +11,7 @@ class Sub:
     player: Player
     remaining_surface_turns: int
     board: list[list[int]]
+    last_actions: list[Any]
 
 
     def __init__(self, player: Player, board: list[list[int]]):
@@ -21,6 +23,7 @@ class Sub:
         self.powers = {k:0 for k in Power}
         self.damage = 0
         self.remaining_surface_turns = 0
+        self.last_actions = []
 
     
     def set_starting_loc(self, loc: tuple[int, int]):
