@@ -146,7 +146,9 @@ class Game:
 
     
     def _get_observation(self):
-        """Things to go in the observation:
+        """
+        # TODO standardize length of observation
+        Things to go in the observation:
         your damage
         opponents damage
         your location row
