@@ -4,18 +4,18 @@ from constants import Direction, Power
 
 
 class BreakdownChannel(Enum):
-    Yellow = "yellow"
-    Orange = "orange"
-    Black = "black"
-    Radiation = "radiation"
-    No_Channel = "none"
+    Yellow = 1
+    Orange = 2
+    Black = 3
+    Radiation = 4
+    No_Channel = 5
 
 
 class BreakdownType(Enum):
-    Red = "red"
-    Yellow = "yellow"
-    Green = "green"
-    Radiation = "radiation"
+    Red = 1
+    Yellow = 2
+    Green = 3
+    Radiation = 4
 
 
 POWER_TO_BREAKDOWN_TYPE = {
@@ -33,7 +33,7 @@ class BreakdownDot:
     marked: bool = False
 
     def __repr__(self) -> str:
-        return f"{self.type.value} dot on {self.channel.value} channel, at {self.direction_class.value} direction, is {self.marked} marked."
+        return f"{self.type} dot on {self.channel} channel, at {self.direction_class} direction, is {self.marked} marked."
 
 
 class BreakdownMap:

@@ -147,14 +147,17 @@ class Game:
     
     def _get_observation(self):
         """Things to go in the observation:
-        the map??
-        your breakdowns?
+        your damage
+        opponents damage
+        your location row
+        your location col
+        current phase num
+        your breakdowns
+        all actions opponent used on their last turn
+
+        maybe to add:
         your power marks??
-        your opponents last action (
-            direction they last moved
-            any powers they used
-                how they aimed those powers
-        )
+        the map??
         """
         observation = [
             self.player.damage,
@@ -163,6 +166,9 @@ class Game:
             self.player.loc[1],
             self.phase.value,
         ]
+        for breakdown in self.player.breakdownMap.all_breakdowns:
+            representation = str(breakdown.channel.value) + str(breakdown.direction_class.value) + str(breakdown.type.value) + str(int(breakdown.marked))
+            observation.append(int(representation))
         if self.player == self.p1:
             observation += self.p2_last_actions
         else:
