@@ -2,10 +2,10 @@ from enum import Enum
 
 
 class Direction(Enum):
-    North = "north"
-    South = "south"
-    West = "west"
-    East = "east"
+    North = 1
+    South = 2
+    West = 3
+    East = 4
 
 DIRECTION_COORDS = { #col, row
     Direction.North: (0,-1),
@@ -15,13 +15,13 @@ DIRECTION_COORDS = { #col, row
 }
 
 class Power(Enum):
-    Drone = "drone"
-    Silence = "silence"
-    Torpedo = "torpedo"
+    Drone = 1
+    Silence = 2
+    Torpedo = 3
 
 class Player(Enum):
-    One = "player one"
-    Two = "player two"
+    One = 1
+    Two = 2
 
 POWER_COSTS = {
     Power.Torpedo: 3,

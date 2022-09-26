@@ -154,6 +154,8 @@ class Game:
         current phase num
         your breakdowns
         all actions opponent used on their last turn
+        # TODO: dont add certain things to last_actions
+            like starting pos, breakdown, power mark
 
         maybe to add:
         your power marks??
@@ -167,7 +169,7 @@ class Game:
             self.phase.value,
         ]
         for breakdown in self.player.breakdownMap.all_breakdowns:
-            representation = str(breakdown.channel.value) + str(breakdown.direction_class.value) + str(breakdown.type.value) + str(int(breakdown.marked))
+            representation = int(breakdown.__repr__())
             observation.append(int(representation))
         if self.player == self.p1:
             observation += self.p2_last_actions
@@ -340,21 +342,18 @@ if __name__ == "__main__":
     num_games = 0
     try:
         while True:
-            # print("---------------------------------------")
-            # print(f"player: {g.player.player}")
+            print("---------------------------------------")
+            print(f"player: {g.player.player}")
             options = g.legal_actions()
-            # print("phase: ", g.phase)
-            # print("options: ", options)
+            print("options: ", options)
             if len(options) > 1 and g.phase in [Phase.Movement, Phase.Choose_Power]:
                 action = randint(1,len(options)-1)
             else:
                 action = randint(0,len(options)-1)
-            # print("action: ", action)
-            # print("player: ", g.player.player)
-            # print("player loc: ", g.player.loc)
-            # print("remaining surface turns: ", g.player.remaining_surface_turns)
-            # print("path: ", g.player.path)
             obs, reward, done = g.step(options[int(action)])
+            print("obs: ", obs)
+            print("reward: ", reward)
+            print("done: ", done)
             if done:
                 g = Game(does_draw)
                 num_games += 1

@@ -15,7 +15,7 @@ class Sub:
     def __init__(self, player: Player, board: list[list[int]]):
         self.player = player
         self.board = board
-        self.loc = None
+        self.loc = (-1,-1)
         self.path = []
         self.breakdownMap = BreakdownMap()
         self.powers = {k:0 for k in Power}

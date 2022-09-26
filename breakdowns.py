@@ -33,7 +33,7 @@ class BreakdownDot:
     marked: bool = False
 
     def __repr__(self) -> str:
-        return f"{self.type} dot on {self.channel} channel, at {self.direction_class} direction, is {self.marked} marked."
+        return str(self.channel.value) + str(self.direction_class.value) + str(self.type.value) + str(int(self.marked))
 
 
 class BreakdownMap:
