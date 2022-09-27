@@ -1,6 +1,7 @@
 from typing import Any
 from constants import DIRECTION_COORDS, Power, Direction, Player, POWER_COSTS, DIRECTION_COORDS
 from breakdowns import BreakdownMap, BreakdownChannel, POWER_TO_BREAKDOWN_TYPE
+from observation import Public_Actions
 
 
 class Sub:
@@ -23,7 +24,7 @@ class Sub:
         self.powers = {k:0 for k in Power}
         self.damage = 0
         self.remaining_surface_turns = 0
-        self.last_actions = []
+        self.last_actions = Public_Actions()
 
     
     def set_starting_loc(self, loc: tuple[int, int]):

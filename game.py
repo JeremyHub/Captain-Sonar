@@ -1,5 +1,6 @@
 from enum import Enum
 from random import randint
+from observation import Observation, Public_Actions
 from sub import Sub
 from constants import Player, Direction, ALPHA_BOARD, Power
 import pygame as pg
@@ -101,18 +102,30 @@ class Game:
 
     
     def step(self, action):
+        observation = Observation(Public_Actions())
         if self.phase == Phase.Starting:
             self.player.set_starting_loc(action)
         elif self.phase == Phase.Choose_Power:
             if action is not None:
                 self.player.powers[action] = 0
                 if action == Power.Drone:
-                    observation = self.opponent.get_quadrant() # TODO: make this consistent with constant length observation
+                    self.player.last_actions.drone_used = 1
+                    observation.opp_quadrant = self.opponent.get_quadrant() # TODO: make this consistent with constant length observation
                 else:
+                    if action == Power.Silence:
+                        self.player.last_actions.silence_used = 1
+                    elif action == Power.Torpedo:
+                        self.player.last_actions.torpedo_used = 1
+                    else:
+                        raise Exception("power is not drone, silence, or topedo")
                     self.power_to_aim = action
         elif self.phase == Phase.Movement:
             self.player.move(action)
             self.declared_direction = action
+            if action is None:
+                self.player.last_actions.direction_moved = 0
+            else:
+                self.player.last_actions.direction_moved = action.value
         elif self.phase == Phase.Breakdown:
             self.player.breakdown(action, self.declared_direction)
         elif self.phase == Phase.Mark_Power:
@@ -122,10 +135,8 @@ class Game:
             self.power_to_aim = None
         else:
             raise Exception("phase not found")
-        if not self.phase in [Phase.Starting, Phase.Breakdown, Phase.Mark_Power]:
-            self.player.last_actions.append(action)
         reward = self.opponent.damage - self.player.damage
-        observation = self._get_observation()
+        self._update_observation(observation)
         done = self.player.damage >= 4 or self.opponent.damage >= 4
         self.next_phase()
         if self.does_draw:
@@ -134,37 +145,20 @@ class Game:
                     pg.quit()
                     raise KeyboardInterrupt()
             self.update_display()
-        return observation, reward, done
+        return observation.get_obs_arr(), reward, done
 
     
-    def _get_observation(self):
-        """
-        # TODO standardize length of observation
-        Things to go in the observation:
-        your damage
-        opponents damage
-        your location row
-        your location col
-        current phase num
-        your breakdowns
-        all actions opponent used on their last turn
+    def _update_observation(self, obs: Observation):
+        obs.your_dmg = self.player.damage
+        obs.opp_dmg = self.opponent.damage
+        obs.row = self.player.loc[0]
+        obs.col = self.player.loc[1]
+        obs.phase_num = self.phase.value
+        obs.opp_actions = self.opponent.last_actions
 
-        maybe to add:
-        your power marks??
-        the map??
-        """
-        observation = [
-            self.player.damage,
-            self.opponent.damage,
-            self.player.loc[0],
-            self.player.loc[1],
-            self.phase.value,
-        ]
+        obs.breakdowns = []
         for breakdown in self.player.breakdownMap.all_breakdowns:
-            representation = int(breakdown.__repr__())
-            observation.append(int(representation))
-        observation += self.opponent.last_actions
-        return observation
+            obs.breakdowns.append(int(breakdown.marked))
 
     
     def legal_actions(self):
@@ -198,18 +192,18 @@ class Game:
             assert self.phase_num == None, "phase is starting but phase_num is not none"
             if self.player == self.p1:
                 self.player = self.p2
-                self.player.last_actions = []
+                self.player.last_actions = Public_Actions()
             else:
                 assert self.player == self.p2, "player is not p1 or p2 in starting phase"
                 self.phase_num = 0
                 self.phase = self.PHASES[self.phase_num]
                 self.player = self.p1
-                self.player.last_actions = []
+                self.player.last_actions = Public_Actions()
         elif self.power_to_aim:
             self.phase = Phase.Aim_Power
         elif self.phase_num == len(self.PHASES)-1:
             self.player = self.opponent
-            self.player.last_actions = []
+            self.player.last_actions = Public_Actions()
             self.phase_num = 0
             self.phase = self.PHASES[self.phase_num]
         else:
@@ -222,9 +216,12 @@ class Game:
         power = self.power_to_aim
         if power == Power.Silence:
             self.player.silence(action)
+            self.player.last_actions.silence_dir = action[0].value
         elif power == Power.Torpedo:
             explosion_loc = action
             self._explosion(explosion_loc)
+            self.player.last_actions.torpedo_row = explosion_loc[0]
+            self.player.last_actions.torpedo_col = explosion_loc[1]
         else:
             raise Exception("power not found")
 
@@ -319,24 +316,25 @@ class Game:
 
 
 if __name__ == "__main__":
-    does_draw = True
+    does_draw = False
+    # does_draw = True
     g = Game(does_draw)
     num_games = 0
     try:
         while True:
-            print("---------------------------------------")
-            print(f"player: {g.player.player}")
+            # print("---------------------------------------")
+            # print(f"player: {g.player.player}")
             options = g.legal_actions()
-            print("options: ", options)
+            # print("options: ", options)
             if len(options) > 1 and g.phase in [Phase.Movement, Phase.Choose_Power]:
                 action = randint(1,len(options)-1)
             else:
                 action = randint(0,len(options)-1)
-            print("action: ", action)
+            # print("action: ", action)
             obs, reward, done = g.step(options[int(action)])
-            print("obs: ", obs)
-            print("reward: ", reward)
-            print("done: ", done)
+            # print("obs: ", obs)
+            # print("reward: ", reward)
+            # print("done: ", done)
             if done:
                 g = Game(does_draw)
                 num_games += 1
