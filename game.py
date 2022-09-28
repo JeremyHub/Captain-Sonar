@@ -145,7 +145,7 @@ class Game:
                     pg.quit()
                     raise KeyboardInterrupt()
             self.update_display()
-        return observation.get_obs_arr(), reward, done
+        return observation.__dict__, reward, done
 
     
     def _update_observation(self, obs: Observation):
@@ -322,18 +322,18 @@ if __name__ == "__main__":
     num_games = 0
     try:
         while True:
-            # print("---------------------------------------")
-            # print(f"player: {g.player.player}")
+            print("---------------------------------------")
+            print(f"player: {g.player.player}")
             options = g.legal_actions()
-            # print("options: ", options)
+            print("options: ", options)
             if len(options) > 1 and g.phase in [Phase.Movement, Phase.Choose_Power]:
                 action = randint(1,len(options)-1)
             else:
                 action = randint(0,len(options)-1)
-            # print("action: ", action)
+            print("action: ", action)
             obs, reward, done = g.step(options[int(action)])
-            # print("obs: ", obs)
-            # print("reward: ", reward)
+            print("obs: ", obs)
+            print("reward: ", reward)
             # print("done: ", done)
             if done:
                 g = Game(does_draw)
