@@ -69,9 +69,9 @@ class Game:
 
     def draw_all_boards(self):
         self.screen.fill((0,0,0))
-        self.setup_boards("C:/Users/jerem/Documents/GitHub/Captain-Sonar/powers.png", BoardNumDisplay.Powers)
-        self.setup_boards("C:/Users/jerem/Documents/GitHub/Captain-Sonar/breakdowns.png", BoardNumDisplay.Breakdowns)
-        self.setup_map("C:/Users/jerem/Documents/GitHub/Captain-Sonar/alpha_map.png")
+        self.setup_boards("powers.png", BoardNumDisplay.Powers)
+        self.setup_boards("breakdowns.png", BoardNumDisplay.Breakdowns)
+        self.setup_map("alpha_map.png")
 
 
     def setup_map(self, path):
@@ -110,7 +110,7 @@ class Game:
                 self.player.powers[action] = 0
                 if action == Power.Drone:
                     self.player.last_actions.drone_used = 1
-                    observation.opp_quadrant = self.opponent.get_quadrant() # TODO: make this consistent with constant length observation
+                    observation.opp_quadrant = self.opponent.get_quadrant()
                 else:
                     if action == Power.Silence:
                         self.player.last_actions.silence_used = 1
@@ -145,7 +145,7 @@ class Game:
                     pg.quit()
                     raise KeyboardInterrupt()
             self.update_display()
-        return observation.__dict__, reward, done
+        return observation.get_obs_arr(), reward, done
 
     
     def _update_observation(self, obs: Observation):
@@ -290,7 +290,6 @@ class Game:
 
 
     def _pg_update_powers(self):
-        # location out of the powers
         power_locs = {
             Power.Silence: (2,0),
             Power.Drone: (1,0),
@@ -316,21 +315,21 @@ class Game:
 
 
 if __name__ == "__main__":
-    does_draw = False
-    # does_draw = True
+    # does_draw = False
+    does_draw = True
     g = Game(does_draw)
     num_games = 0
     try:
         while True:
             print("---------------------------------------")
-            print(f"player: {g.player.player}")
+            # print(f"player: {g.player.player}")
             options = g.legal_actions()
-            print("options: ", options)
+            # print("options: ", options)
             if len(options) > 1 and g.phase in [Phase.Movement, Phase.Choose_Power]:
                 action = randint(1,len(options)-1)
             else:
                 action = randint(0,len(options)-1)
-            print("action: ", action)
+            # print("action: ", action)
             obs, reward, done = g.step(options[int(action)])
             print("obs: ", obs)
             print("reward: ", reward)

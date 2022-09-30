@@ -26,7 +26,8 @@ class Public_Actions:
 @dataclass
 class Observation:
     """
-    all actions opponent used on their last turn
+    observation of everything a player can see about the game
+    -1 means n/a
 
     maybe to add:
     your power marks??
