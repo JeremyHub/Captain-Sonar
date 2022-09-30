@@ -36,6 +36,10 @@ class BreakdownDot:
         return str(self.channel.value) + str(self.direction_class.value) + str(self.type.value) + str(int(self.marked))
 
 
+    def __hash__(self) -> int:
+        return hash((self.channel, self.type, self.direction_class))
+
+
 class BreakdownMap:
     def __init__(self):
         self.all_breakdowns = [

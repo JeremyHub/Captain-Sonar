@@ -315,13 +315,14 @@ class Game:
 
 
 if __name__ == "__main__":
-    # does_draw = False
-    does_draw = True
+    does_draw = False
+    # does_draw = True
     g = Game(does_draw)
     num_games = 0
+    actions = set()
     try:
         while True:
-            print("---------------------------------------")
+            # print("---------------------------------------")
             # print(f"player: {g.player.player}")
             options = g.legal_actions()
             # print("options: ", options)
@@ -330,13 +331,16 @@ if __name__ == "__main__":
             else:
                 action = randint(0,len(options)-1)
             # print("action: ", action)
+            if not g.phase == Phase.Starting or g.phase == Phase.Aim_Power:
+                actions.add(options[int(action)])
             obs, reward, done = g.step(options[int(action)])
-            print("obs: ", obs)
-            print("reward: ", reward)
+            # print("obs: ", obs)
+            # print("reward: ", reward)
             # print("done: ", done)
             if done:
                 g = Game(does_draw)
                 num_games += 1
     finally:
         print(num_games)
+        print(len(actions))
         pg.quit()
