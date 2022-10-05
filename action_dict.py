@@ -2,8 +2,8 @@ from breakdowns import BreakdownMap
 from constants import Direction, Power
 
 def make_action_dict(board_x, board_y):
-    action_dict = {}
-    action_num = 0
+    action_dict = {None: 0}
+    action_num = 1
     for x in range(board_x):
         for y in range(board_y):
             action_dict[(x,y)] = action_num
@@ -20,6 +20,6 @@ def make_action_dict(board_x, board_y):
         action_num += 1
     breakdowns = BreakdownMap()
     for breakdown in breakdowns.all_breakdowns:
-        action_dict[breakdown.__str__()] = action_num
+        action_dict[breakdown] = action_num
         action_num += 1
     return action_dict

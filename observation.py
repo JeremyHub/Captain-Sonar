@@ -30,11 +30,11 @@ class Observation:
     -1 means n/a
 
     maybe to add:
-    your power marks??
     the map??
     """
-    opp_actions: Public_Actions
+    opp_actions: Public_Actions = None
     breakdowns: list = None
+    power_marks = None
     your_dmg: int = -1
     opp_dmg: int = -1
     row: int = -1
@@ -53,4 +53,4 @@ class Observation:
             self.col,
             self.phase_num,
             self.opp_quadrant
-        ] + self.opp_actions.get_obs_arr() + self.breakdowns
+        ] + self.opp_actions.get_obs_arr() + self.breakdowns + self.power_marks

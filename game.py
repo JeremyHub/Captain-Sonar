@@ -1,5 +1,7 @@
 from enum import Enum
 from random import randint
+from typing import Any, Dict
+from action_dict import make_action_dict
 from observation import Observation, Public_Actions
 from sub import Sub
 from constants import Player, Direction, ALPHA_BOARD, Power
@@ -38,10 +40,15 @@ class Game:
     power_to_aim: Power
     does_draw: bool
     screen: pg.Surface
+    action_dict = dict[Any, int]
+    reverse_action_dict = dict[Any, int]
     
 
     def __init__(self, does_draw = False):
         self.does_draw = does_draw
+        self.board = ALPHA_BOARD
+        self.action_dict = make_action_dict(len(self.board), len(self.board[0]))
+        self.reverse_action_dict = {v: k for k, v in self.action_dict.items()}
         if self.does_draw:
             pg.init()
             self.screen = pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
@@ -55,7 +62,6 @@ class Game:
 
     def reset(self):
         self.history = []
-        self.board = ALPHA_BOARD
         self.p1 = Sub(Player.One, self.board)
         self.p2 = Sub(Player.Two, self.board)
         self.player = self.p1
@@ -102,7 +108,8 @@ class Game:
 
     
     def step(self, action):
-        observation = Observation(Public_Actions())
+        action = self.reverse_action_dict[action]
+        observation = Observation()
         if self.phase == Phase.Starting:
             self.player.set_starting_loc(action)
         elif self.phase == Phase.Choose_Power:
@@ -155,6 +162,7 @@ class Game:
         obs.col = self.player.loc[1]
         obs.phase_num = self.phase.value
         obs.opp_actions = self.opponent.last_actions
+        obs.power_marks = list(self.player.powers.values())
 
         obs.breakdowns = []
         for breakdown in self.player.breakdownMap.all_breakdowns:
@@ -162,25 +170,30 @@ class Game:
 
     
     def legal_actions(self):
+        actions = None
         if self.phase == Phase.Starting:
             actions = []
             for row in range(len(self.board)):
                 for col in range(len(self.board[0])):
                     if self.board[row][col] == 0:
                         actions.append((row,col))
-            return actions
+            actions = actions
         elif self.phase == Phase.Choose_Power:
-            return self.player.get_active_powers()
+            actions = self.player.get_active_powers()
         elif self.phase == Phase.Movement:
-            return self.player.get_valid_directions()
+            actions = self.player.get_valid_directions()
         elif self.phase == Phase.Breakdown:
-            return self.player.get_unbroken_breakdowns(self.declared_direction)
+            actions = self.player.get_unbroken_breakdowns(self.declared_direction)
         elif self.phase == Phase.Mark_Power:
-            return self.player.get_unmarked_powers()
+            actions = self.player.get_unmarked_powers()
         elif self.phase == Phase.Aim_Power:
-            return self.player.get_power_options(self.power_to_aim)
+            actions = self.player.get_power_options(self.power_to_aim)
         else:
             raise Exception("phase not found")
+        action_nums = []
+        for action in actions:
+            action_nums.append(self.action_dict[action])
+        return action_nums
 
 
     def next_phase(self):
