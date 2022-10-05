@@ -312,35 +312,3 @@ class Game:
                     x_offset_frac, y_offset_frac = mark_offsets[offset_num]
                     rec = pg.Rect(x(power_locs[power][0])+(x_offset_frac*self.SCREEN_WIDTH), y(power_locs[power][1])+height+(y_offset_frac*self.SCREEN_HEIGHT), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
                     pg.draw.rect(self.screen, color, rec)
-
-
-if __name__ == "__main__":
-    does_draw = False
-    # does_draw = True
-    g = Game(does_draw)
-    num_games = 0
-    actions = set()
-    try:
-        while True:
-            # print("---------------------------------------")
-            # print(f"player: {g.player.player}")
-            options = g.legal_actions()
-            # print("options: ", options)
-            if len(options) > 1 and g.phase in [Phase.Movement, Phase.Choose_Power]:
-                action = randint(1,len(options)-1)
-            else:
-                action = randint(0,len(options)-1)
-            # print("action: ", action)
-            if not g.phase == Phase.Starting or g.phase == Phase.Aim_Power:
-                actions.add(options[int(action)])
-            obs, reward, done = g.step(options[int(action)])
-            # print("obs: ", obs)
-            # print("reward: ", reward)
-            # print("done: ", done)
-            if done:
-                g = Game(does_draw)
-                num_games += 1
-    finally:
-        print(num_games)
-        print(len(actions))
-        pg.quit()
