@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
-from breakdowns import BreakdownMap
+from game.breakdowns import BreakdownMap
+from game.constants import Power
 
 
 NUM_BREAKDOWNS = len(BreakdownMap().all_breakdowns)
@@ -34,7 +35,7 @@ class Observation:
     """
     opp_actions: Public_Actions = None
     breakdowns: list = None
-    power_marks = None
+    power_marks: dict[Power, int] = None
     your_dmg: int = -1
     opp_dmg: int = -1
     row: int = -1
@@ -46,6 +47,7 @@ class Observation:
     def get_obs_arr(self):
         assert self.opp_actions is not None
         assert len(self.breakdowns) == NUM_BREAKDOWNS
+        assert len(self.power_marks) == len(Power)
         return [
             self.your_dmg,
             self.opp_dmg,

@@ -1,27 +1,27 @@
-from typing import Tuple
-from game import Game, Phase
-from random import randint
+from game.game import Game
 import pygame as pg
-from action_dict import make_action_dict
+import players.random_player as randplayer
 
 if __name__ == "__main__":
-    # does_draw = False
-    does_draw = True
+    does_draw = False
+    # does_draw = True
     g = Game(does_draw)
     num_games = 0
+    p1 = randplayer.choose_action
+    p2 = randplayer.choose_action
+    obs = None
     try:
         while True:
             # print("---------------------------------------")
             # print(f"player: {g.player.player}")
             options = g.legal_actions()
-            assert all([isinstance(x, int) for x in options])
+            if g.to_play() == 1:
+                action = p1(options, obs)
+            elif g.to_play() == 2:
+                action = p2(options, obs)
             # print("options: ", options)
-            if len(options) > 1 and g.phase in [Phase.Movement, Phase.Choose_Power]:
-                action = randint(1,len(options)-1)
-            else:
-                action = randint(0,len(options)-1)
             # print("action: ", action)
-            obs, reward, done = g.step(options[int(action)])
+            obs, reward, done = g.step(options[action])
             # print("obs: ", obs)
             # print("reward: ", reward)
             # print("done: ", done)

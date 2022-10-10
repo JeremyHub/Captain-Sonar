@@ -1,5 +1,5 @@
-from breakdowns import BreakdownMap
-from constants import Direction, Power
+from game.breakdowns import BreakdownMap
+from game.constants import Direction, Power
 
 def make_action_dict(board_x, board_y):
     action_dict = {None: 0}

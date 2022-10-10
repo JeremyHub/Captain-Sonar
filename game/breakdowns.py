@@ -1,6 +1,6 @@
 from enum import Enum
 from dataclasses import dataclass
-from constants import Direction, Power
+from game.constants import Direction, Power
 
 
 class BreakdownChannel(Enum):

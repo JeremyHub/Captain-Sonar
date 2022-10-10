@@ -1,10 +1,10 @@
 from enum import Enum
 from random import randint
 from typing import Any, Dict
-from action_dict import make_action_dict
-from observation import Observation, Public_Actions
-from sub import Sub
-from constants import Player, Direction, ALPHA_BOARD, Power
+from game.action_dict import make_action_dict
+from game.observation import Observation, Public_Actions
+from game.sub import Sub
+from game.constants import Player, Direction, ALPHA_BOARD, Power
 import pygame as pg
 
 
@@ -40,15 +40,15 @@ class Game:
     power_to_aim: Power
     does_draw: bool
     screen: pg.Surface
-    action_dict = dict[Any, int]
-    reverse_action_dict = dict[Any, int]
+    ACTION_DICT = dict[Any, int]
+    REVERSE_ACTION_DICT = dict[Any, int]
     
 
     def __init__(self, does_draw = False):
         self.does_draw = does_draw
         self.board = ALPHA_BOARD
-        self.action_dict = make_action_dict(len(self.board), len(self.board[0]))
-        self.reverse_action_dict = {v: k for k, v in self.action_dict.items()}
+        self.ACTION_DICT = make_action_dict(len(self.board), len(self.board[0]))
+        self.REVERSE_ACTION_DICT = {v: k for k, v in self.ACTION_DICT.items()}
         if self.does_draw:
             pg.init()
             self.screen = pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
@@ -75,9 +75,9 @@ class Game:
 
     def draw_all_boards(self):
         self.screen.fill((0,0,0))
-        self.setup_boards("powers.png", BoardNumDisplay.Powers)
-        self.setup_boards("breakdowns.png", BoardNumDisplay.Breakdowns)
-        self.setup_map("alpha_map.png")
+        self.setup_boards("res/powers.png", BoardNumDisplay.Powers)
+        self.setup_boards("res/breakdowns.png", BoardNumDisplay.Breakdowns)
+        self.setup_map("res/alpha_map.png")
 
 
     def setup_map(self, path):
@@ -106,9 +106,13 @@ class Game:
         pg.display.flip()
         pass
 
+
+    def to_play(self):
+        return self.player.player.value
+
     
     def step(self, action):
-        action = self.reverse_action_dict[action]
+        action = self.REVERSE_ACTION_DICT[action]
         observation = Observation()
         if self.phase == Phase.Starting:
             self.player.set_starting_loc(action)
@@ -192,7 +196,7 @@ class Game:
             raise Exception("phase not found")
         action_nums = []
         for action in actions:
-            action_nums.append(self.action_dict[action])
+            action_nums.append(self.ACTION_DICT[action])
         return action_nums
 
 

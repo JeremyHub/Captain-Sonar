@@ -1,7 +1,7 @@
 from typing import Any
-from constants import DIRECTION_COORDS, Power, Direction, Player, POWER_COSTS, DIRECTION_COORDS
-from breakdowns import BreakdownMap, BreakdownChannel, POWER_TO_BREAKDOWN_TYPE
-from observation import Public_Actions
+from game.constants import DIRECTION_COORDS, Power, Direction, Player, POWER_COSTS, DIRECTION_COORDS
+from game.breakdowns import BreakdownMap, BreakdownChannel, POWER_TO_BREAKDOWN_TYPE
+from game.observation import Public_Actions
 
 
 class Sub:
