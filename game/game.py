@@ -147,9 +147,9 @@ class Game:
         else:
             raise Exception("phase not found")
         reward = self.opponent.damage - self.player.damage
-        self._update_observation(observation)
         done = self.player.damage >= 4 or self.opponent.damage >= 4
         self.next_phase()
+        self._update_observation(observation)
         if self.does_draw:
             for event in pg.event.get():
                 if event.type == pg.QUIT:
