@@ -14,8 +14,12 @@ if __name__ == "__main__":
     p2 = explayer.choose_action
     p2_total_dmg = 0
     obs = None
+    prev_num = -1
     try:
         while True:
+            if not num_games % 100 and not num_games == prev_num:
+                print(num_games)
+                prev_num = num_games
             if should_print: print("---------------------------------------")
             if should_print: print(f"player: {g.player.player}")
             options = g.legal_actions()
