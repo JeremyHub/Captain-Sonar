@@ -1,5 +1,7 @@
+from game.breakdowns import BreakdownMap
 from game.game import Game
 import pygame as pg
+from game.observation import Observation, Public_Actions
 import players.random_player as randplayer
 import players.expert_player as explayer
 
@@ -13,7 +15,7 @@ if __name__ == "__main__":
     p1_total_dmg = 0
     p2 = explayer.choose_action
     p2_total_dmg = 0
-    obs = None
+    obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
     prev_num = -1
     try:
         while True:
@@ -24,7 +26,7 @@ if __name__ == "__main__":
             if should_print: print(f"player: {g.player.player}")
             options = g.legal_actions()
             if g.to_play() == 1:
-                action = p1(options, obs)
+                action = p1(options, obs, g.ACTION_DICT, g.REVERSE_ACTION_DICT)
             elif g.to_play() == 2:
                 action = p2(options, obs, g.ACTION_DICT, g.REVERSE_ACTION_DICT)
             if should_print: print("phase: ", g.phase)

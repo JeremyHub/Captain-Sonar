@@ -171,6 +171,8 @@ class Game:
         obs.breakdowns = []
         for breakdown in self.player.breakdownMap.all_breakdowns:
             obs.breakdowns.append(int(breakdown.marked))
+            
+        return obs
 
     
     def legal_actions(self):
