@@ -10,7 +10,7 @@ for breakdown in breakdowns.all_breakdowns:
         breakdowns_on_paths.add(breakdown)
 
 def choose_action(actions, obs, action_dict, reverse_action_dict):
-    
+
     # if its aim power phase
     if obs[4] == 3 and len(actions) > 1:
         # if its torpedo
@@ -43,7 +43,7 @@ def choose_action(actions, obs, action_dict, reverse_action_dict):
                 least_marked = val
                 best_dir = key
         # if we will take damage, surface instead
-        if least_marked == 5:
+        if least_marked == 1:
             return 0
         return best_dir
     # if its the breadkown phase
