@@ -9,7 +9,7 @@ class Random_Actor(Actor):
         super().__init__(action_dict, reverse_action_dict)
 
 
-    def choose_action(self, actions: list[int], obs: list[int]):
+    def _choose_action(self, actions: list[int], obs: list[int]):
         # if phase is mov or choose power, dont do nothing
         if len(actions) > 1 and obs and obs[4] in [4, 2]:
             action = randint(1,len(actions)-1)

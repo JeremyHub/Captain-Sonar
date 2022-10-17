@@ -16,7 +16,7 @@ class Expert_Actor(Actor):
                 self.breakdowns_on_paths.add(breakdown)
 
 
-    def choose_action(self, actions: list[int], obs: list[int]):
+    def _choose_action(self, actions: list[int], obs: list[int]):
         # if its aim power phase
         if obs[4] == 3 and len(actions) > 1:
             # if its torpedo
@@ -71,3 +71,17 @@ class Expert_Actor(Actor):
         else:
             action = randint(0,len(actions)-1)
         return action
+
+
+    def _get_possible_enemy_locs(self):
+        opp_moves = []
+        for obs in self.obs_history:
+            opp_quadrant = obs[5]
+            opp_action = obs[6]
+            opp_torpedo_used = obs[7]
+            if opp_torpedo_used:
+                opp_torpedo_row = obs[8]
+                opp_torpedo_col = obs[9]
+            opp_silence_used = obs[10]
+            if opp_silence_used:
+                opp_silence_dir = obs[11]
