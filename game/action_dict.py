@@ -2,6 +2,7 @@ from game.breakdowns import BreakdownMap
 from game.constants import Direction, Power
 
 def make_action_dict(board_x, board_y):
+    # none is surfacing for movement phase and doing nothing for power mark/activate phase
     action_dict = {None: 0}
     action_num = 1
     for x in range(board_x):
