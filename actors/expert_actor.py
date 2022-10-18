@@ -3,6 +3,7 @@ from typing import Any
 
 from game.breakdowns import BreakdownChannel, BreakdownMap
 from actors.actor import Actor
+from game.sub import Sub
 
 
 class Expert_Actor(Actor):
@@ -11,6 +12,13 @@ class Expert_Actor(Actor):
         super().__init__(action_dict, reverse_action_dict)
         self.breakdowns_on_paths = set()
         self.breakdowns = BreakdownMap()
+        self.examined_obs = set()
+
+        self.possible_positions: set[tuple[int, int]] = set()
+        for row in range(len(self.board)):
+            for col in range(len(self.board[row])):
+                self.possible_positions.add((row, col))
+
         for breakdown in self.breakdowns.all_breakdowns:
             if breakdown.channel not in [BreakdownChannel.No_Channel, BreakdownChannel.Radiation]:
                 self.breakdowns_on_paths.add(breakdown)
@@ -74,14 +82,23 @@ class Expert_Actor(Actor):
 
 
     def _get_possible_enemy_locs(self):
-        opp_moves = []
-        for obs in self.obs_history:
+        unexamined_obs = []
+        for obs in self.first_phase_obs_history:
+            if obs in self.examined_obs: continue
+            unexamined_obs.append(obs)
+        
+        for obs in unexamined_obs:
             opp_quadrant = obs[5]
             opp_action = obs[6]
+
             opp_torpedo_used = obs[7]
-            if opp_torpedo_used:
-                opp_torpedo_row = obs[8]
-                opp_torpedo_col = obs[9]
+            opp_torpedo_row = obs[8]
+            opp_torpedo_col = obs[9]
+
             opp_silence_used = obs[10]
-            if opp_silence_used:
-                opp_silence_dir = obs[11]
+            opp_silence_dir = obs[11]
+            
+            for loc in self.possible_positions:
+                if not opp_quadrant == -1:
+                    if not opp_quadrant == Sub.get_quadrant(loc, self.board):
+                        self.possible_positions.remove(loc)

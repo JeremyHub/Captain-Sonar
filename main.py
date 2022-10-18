@@ -11,9 +11,9 @@ if __name__ == "__main__":
     should_print = False
     g = Game(does_draw)
     num_games = 0
-    p1 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT)
+    p1 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     p1_total_dmg = 0
-    p2 = Expert_Actor(g. ACTION_DICT, g.REVERSE_ACTION_DICT)
+    p2 = Expert_Actor(g. ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     p2_total_dmg = 0
     obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
     prev_num = -1

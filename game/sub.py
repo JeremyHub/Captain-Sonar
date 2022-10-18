@@ -129,9 +129,10 @@ class Sub:
         return options
 
 
-    def get_quadrant(self):
-        col_half = int(self.loc[1] > len(self.board[0])-1)
-        row_half = int(self.loc[0] > len(self.board)-1)
+    @classmethod
+    def get_quadrant(cls, loc, board):
+        col_half = int(loc[1] > len(board[0])-1)
+        row_half = int(loc[0] > len(board)-1)
         return col_half + 2*row_half
 
 
