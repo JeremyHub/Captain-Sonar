@@ -104,7 +104,6 @@ class Game:
         self._pg_update_damage()
         self._pg_update_player_pos_and_path()
         pg.display.flip()
-        pass
 
 
     def to_play(self):
