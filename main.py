@@ -38,6 +38,8 @@ if __name__ == "__main__":
             if should_print: print("options: ", options)
             if should_print: print("action: ", action)
             obs, reward, done = g.step(action)
+            g.pg_draw_points(p2.possible_opp_positions, (255,255,255), 10)
+            pg.display.flip()
             if should_print: print("obs: ", obs)
             if should_print: print("reward: ", reward)
             if should_print: print("done: ", done)
