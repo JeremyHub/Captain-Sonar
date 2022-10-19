@@ -1,4 +1,3 @@
-from game.breakdowns import BreakdownMap
 from game.game import Game
 import pygame as pg
 from game.observation import Observation, Public_Actions
@@ -6,8 +5,8 @@ from actors.random_actor import Random_Actor
 from actors.expert_actor import Expert_Actor
 
 if __name__ == "__main__":
-    does_draw = False
-    # does_draw = True
+    # does_draw = False
+    does_draw = True
     should_print = False
     g = Game(does_draw)
     num_games = 0
@@ -29,7 +28,7 @@ if __name__ == "__main__":
                 print(num_games)
                 prev_num = num_games
             if should_print: print("---------------------------------------")
-            if should_print: print(f"player: {g.player.player}")
+            if should_print: print("player: ", g.player.player)
             options = g.legal_actions()
             if g.to_play() == 1:
                 action = p1.choose_action(options, obs)

@@ -260,9 +260,17 @@ class Game:
                 p.damage += 1
 
 
+    def _get_x_on_board(self, x: int):
+        return self.SCREEN_WIDTH/23 + x*self.SCREEN_WIDTH/49.7
+
+
+    def _get_y_on_board(self, y: int):
+        return self.SCREEN_HEIGHT/6.1 + y*self.SCREEN_HEIGHT/18.7
+
+
     def _pg_update_player_pos_and_path(self):
-        x = lambda x: self.SCREEN_WIDTH/23 + x*self.SCREEN_WIDTH/49.7
-        y = lambda y: self.SCREEN_HEIGHT/6.1 + y*self.SCREEN_HEIGHT/18.7
+        x = self._get_x_on_board
+        y = self._get_y_on_board
         l = [(self.p1, self.P1_COLOR, 0), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT*0.008)]
         for player, color, offset in l:
             if player.loc:
@@ -270,9 +278,13 @@ class Game:
                 pg.draw.rect(self.screen, color, rec)
         # update paths of subs
         for player, color, offset in l:
-            for row, col in player.path:
-                rec = pg.Rect(x(col)+offset, y(row)+offset, self.SCREEN_WIDTH/160, self.SCREEN_HEIGHT/80)
-                pg.draw.rect(self.screen, color, rec)
+            self.pg_draw_points(player.path, color, offset)
+
+    
+    def pg_draw_points(self, points: list[tuple[int, int]], color: tuple[int, int, int], offset: float):
+        for row, col in points:
+            rec = pg.Rect(self._get_x_on_board(col)+offset, self._get_y_on_board(row)+offset, self.SCREEN_WIDTH/160, self.SCREEN_HEIGHT/80)
+            pg.draw.rect(self.screen, color, rec)
 
 
     def _pg_update_damage(self):
@@ -336,3 +348,4 @@ class Game:
                     x_offset_frac, y_offset_frac = mark_offsets[offset_num]
                     rec = pg.Rect(x(power_locs[power][0])+(x_offset_frac*self.SCREEN_WIDTH), y(power_locs[power][1])+height+(y_offset_frac*self.SCREEN_HEIGHT), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
                     pg.draw.rect(self.screen, color, rec)
+    

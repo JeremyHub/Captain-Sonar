@@ -44,13 +44,6 @@ class Expert_Actor(Actor):
         if obs[4] == 3 and len(actions) > 1:
             # if its torpedo
             if isinstance(self.reverse_action_dict[actions[1]][0], int):
-
-                # the below is legacy code for picking a place to send the torpedo that doesnt kill you
-                # for action in actions:
-                #     loc = self.reverse_action_dict[action]
-                #     if not self._in_torpedo_range(loc, (obs[2], obs[3])):
-                #         return action
-
                 for action in actions:
                     loc = self.reverse_action_dict[action]
                     if loc in self.possible_opp_positions and not self._in_torpedo_range(loc, (obs[2], obs[3])):
@@ -133,7 +126,7 @@ class Expert_Actor(Actor):
                     self.possible_opp_positions.add(new_loc)
             if opp_silence_used:
                 new_possible_positions = set()
-                for dir, num_moved in Sub.get_silence_options(loc, self.board, [], [Direction(opp_silence_dir)]): # TODO: can make better by adding possible paths for every possible loc
+                for dir, num_moved in Sub.get_silence_options(loc, self.board, [], [Direction(opp_silence_dir)]): # can make better by adding possible paths for every possible loc
                     new_loc = loc
                     for _ in range(num_moved):
                         new_loc = Sub.get_coord_in_direction(new_loc, dir)
