@@ -250,7 +250,7 @@ class Game:
             self.player.last_actions.silence_dir = action[0].value
         elif power == Power.Torpedo:
             explosion_loc = action
-            # self._explosion(explosion_loc)
+            self._explosion(explosion_loc)
             self.player.last_actions.torpedo_row = explosion_loc[0]
             self.player.last_actions.torpedo_col = explosion_loc[1]
         else:
