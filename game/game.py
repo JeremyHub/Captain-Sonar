@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Any
 from game.action_dict import make_action_dict
+from game.breakdowns import BreakdownMap
 from game.observation import Observation, Public_Actions
 from game.sub import Sub
 from game.constants import Player, Direction, ALPHA_BOARD, Power
@@ -123,6 +124,7 @@ class Game:
                 else:
                     if action == Power.Silence:
                         self.player.last_actions.silence_used = 1
+                        return [], 0, True
                     elif action == Power.Torpedo:
                         self.player.last_actions.torpedo_used = 1
                     else:
@@ -146,6 +148,7 @@ class Game:
             raise Exception("phase not found")
         reward = self.opponent.damage - self.player.damage
         done = self.player.damage >= 4 or self.opponent.damage >= 4
+        observation.phase_num = self.phase.value
         self.next_phase()
         self._update_observation(observation)
         if self.does_draw:
@@ -162,7 +165,6 @@ class Game:
         obs.opp_dmg = self.opponent.damage
         obs.row = self.player.loc[0]
         obs.col = self.player.loc[1]
-        obs.phase_num = self.phase.value
         obs.opp_actions = self.opponent.last_actions
         obs.power_marks = list(self.player.powers.values())
 
@@ -184,7 +186,8 @@ class Game:
             actions = actions
         elif self.phase == Phase.Choose_Power:
             actions = self.player.get_active_powers()
-            if self.player.last_actions.direction_moved not in [-1, 0]:
+            # if they have already moved then they cant silence (but can use other powers)
+            if not self.player.last_actions.direction_moved == -1:
                 if Power.Silence in actions:
                     actions.remove(Power.Silence)
         elif self.phase == Phase.Movement:
@@ -227,6 +230,7 @@ class Game:
             self.phase_num = 0
             self.phase = self.PHASES[self.phase_num]
         else:
+            # stop players from moving if they silenced
             if self.player.last_actions.silence_used and self.PHASES[self.phase_num+1] == Phase.Movement:
                 # this assumes there is a phase after movement, which is true
                 self.phase_num += 1

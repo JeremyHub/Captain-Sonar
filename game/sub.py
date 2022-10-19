@@ -12,7 +12,7 @@ class Sub:
     player: Player
     remaining_surface_turns: int
     board: list[list[int]]
-    last_actions: list[Any]
+    last_actions: Public_Actions
 
 
     def __init__(self, player: Player, board: list[list[int]]):

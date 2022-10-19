@@ -5,21 +5,22 @@ from actors.random_actor import Random_Actor
 from actors.expert_actor import Expert_Actor
 
 if __name__ == "__main__":
-    # does_draw = False
-    does_draw = True
+    does_draw = False
+    # does_draw = True
+    # should_print = True
     should_print = False
     g = Game(does_draw)
     num_games = 0
-    p1_total_dmg = 0
-    p2_total_dmg = 0
-    obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
+    p1_total_dmg = 1
+    p2_total_dmg = 1
     prev_num = -1
     done = True
     try:
         while True:
             if done:
-                p1 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
-                p2 = Expert_Actor(g. ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
+                obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
+                p2 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
+                p1 = Expert_Actor(g. ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
                 p1_total_dmg += g.p1.damage
                 p2_total_dmg += g.p2.damage
                 g = Game(does_draw)
@@ -29,7 +30,6 @@ if __name__ == "__main__":
                 prev_num = num_games
             if should_print: print("---------------------------------------")
             if should_print: print("player: ", g.player.player)
-            p2.enemy_loc = g.p1.loc
             options = g.legal_actions()
             if g.to_play() == 1:
                 action = p1.choose_action(options, obs)
@@ -39,8 +39,9 @@ if __name__ == "__main__":
             if should_print: print("options: ", options)
             if should_print: print("action: ", action)
             obs, reward, done = g.step(action)
-            g.pg_draw_points(p2.possible_opp_positions, (255,255,255), 10)
-            pg.display.flip()
+            if does_draw:
+                g.pg_draw_points(p1.possible_opp_positions, (255,255,255), 10)
+                pg.display.flip()
             if should_print: print("obs: ", obs)
             if should_print: print("reward: ", reward)
             if should_print: print("done: ", done)

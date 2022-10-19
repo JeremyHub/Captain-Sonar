@@ -18,7 +18,8 @@ class Expert_Actor(Actor):
         self.possible_opp_positions: set[tuple[int, int]] = set()
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
-                self.possible_opp_positions.add((row, col))
+                if self.board[row][col] == 0:
+                    self.possible_opp_positions.add((row, col))
 
         for breakdown in self.breakdowns.all_breakdowns:
             if breakdown.channel not in [BreakdownChannel.No_Channel, BreakdownChannel.Radiation]:
@@ -28,7 +29,6 @@ class Expert_Actor(Actor):
     def _choose_action(self, actions: list[int], obs: list[int]):
 
         self._update_possible_enemy_locs(obs)
-        assert self.enemy_loc in self.possible_opp_positions
 
         # if its choose power phase
         if obs[4] == 2:
@@ -44,12 +44,12 @@ class Expert_Actor(Actor):
         # if its aim power phase
         if obs[4] == 3 and len(actions) > 1:
             # if its torpedo
-            if isinstance(self.reverse_action_dict[actions[1]][0], int):
+            if not isinstance(self.reverse_action_dict[actions[1]], Direction):
                 for action in actions:
                     loc = self.reverse_action_dict[action]
                     if loc in self.possible_opp_positions and not self._in_torpedo_range(loc, (obs[2], obs[3])):
                         return action
-                raise Exception("should know there is a place to hit when activating a torpedo")
+                # raise Exception("should know there is a place to hit when activating a torpedo")
 
         # if its mov phase
         elif obs[4] == 4 and len(actions) > 1:
@@ -108,7 +108,6 @@ class Expert_Actor(Actor):
 
 
     def _update_possible_locs(self, obs):
-        old_possible_locs = set(self.possible_opp_positions)
 
         opp_dir = obs[6]
 
@@ -119,23 +118,33 @@ class Expert_Actor(Actor):
         opp_silence_used = obs[10]
         opp_silence_dir = obs[11]
 
-        for loc in old_possible_locs:
-            # 0 for silence, -1 for starting/silenced, 1,2,3,4 for directions
-            assert not ((opp_dir > 0) and opp_silence_used), "should not be able to move and silence in the same turn"
+        new_possible_positions = set()
+
+        assert not ((opp_dir >= 0) and opp_silence_used), "should not be able to move/surface and silence in the same turn"
+        for loc in self.possible_opp_positions:
+            # 0 for surface, -1 for starting/silenced, 1,2,3,4 for directions
             if opp_dir > 0:
                 new_loc = Sub.get_coord_in_direction(loc, Direction(opp_dir))
-                self.possible_opp_positions.remove(loc)
-                if Sub.in_bounds(new_loc[0], new_loc[1], self.board) and self.board[new_loc[0]][new_loc[1]] == 0:
-                    self.possible_opp_positions.add(new_loc)
+                try:
+                    if self.board[new_loc[0]][new_loc[1]] == 0:
+                        new_possible_positions.add(new_loc)
+                except Exception:
+                    new_possible_positions
 
-            if opp_silence_used:
-                new_possible_positions = set()
+            elif opp_silence_used:
+                assert opp_dir == -1, "opp silence true but dir was not -1"
                 for dir, num_moved in Sub.get_silence_options(loc, self.board, [], [Direction(opp_silence_dir)]): # can make better by adding possible paths for every possible loc
                     new_loc = loc
                     for _ in range(num_moved):
                         new_loc = Sub.get_coord_in_direction(new_loc, dir)
                     new_possible_positions.add(new_loc)
-                self.possible_opp_positions = new_possible_positions
+
+            else:
+                # the sub was sufraced
+                assert opp_dir == 0, "didnt move or use silence but didnt surface"
+                new_possible_positions = self.possible_opp_positions
+
+        self.possible_opp_positions = new_possible_positions
 
 
     def _in_torpedo_range(self, loc1, loc2):
