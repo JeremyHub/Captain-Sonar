@@ -44,12 +44,13 @@ class Expert_Actor(Actor):
         # if its aim power phase
         if obs[4] == 3 and len(actions) > 1:
             # if its torpedo
-            if not isinstance(self.reverse_action_dict[actions[1]], Direction):
+            test_action = self.reverse_action_dict[actions[1]]
+            if isinstance(test_action, tuple) and len(test_action) == 2:
                 for action in actions:
                     loc = self.reverse_action_dict[action]
-                    if loc in self.possible_opp_positions and not self._in_torpedo_range(loc, (obs[2], obs[3])):
+                    if not self._in_torpedo_range(loc, (obs[2], obs[3])):
                         return action
-                # raise Exception("should know there is a place to hit when activating a torpedo")
+                raise Exception("should know there is a place to hit when activating a torpedo")
 
         # if its mov phase
         elif obs[4] == 4 and len(actions) > 1:
@@ -125,11 +126,8 @@ class Expert_Actor(Actor):
             # 0 for surface, -1 for starting/silenced, 1,2,3,4 for directions
             if opp_dir > 0:
                 new_loc = Sub.get_coord_in_direction(loc, Direction(opp_dir))
-                try:
-                    if self.board[new_loc[0]][new_loc[1]] == 0:
-                        new_possible_positions.add(new_loc)
-                except Exception:
-                    new_possible_positions
+                if Sub.in_bounds(new_loc[0], new_loc[1], self.board) and self.board[new_loc[0]][new_loc[1]] == 0:
+                    new_possible_positions.add(new_loc)
 
             elif opp_silence_used:
                 assert opp_dir == -1, "opp silence true but dir was not -1"

@@ -156,7 +156,7 @@ class Sub:
 
     @classmethod
     def in_bounds(cls, row, col, board):
-        return 0 <= row < len(board) and 0 <= col < len(board[0])
+        return (0 <= row < len(board)) and (0 <= col < len(board[0]))
 
 
     @classmethod
@@ -174,6 +174,7 @@ class Sub:
                         options.append(loc)
                         to_add.append(loc)
             to_check = to_add
+        assert options, "should always be places to fire a torpedo"
         return options
 
     

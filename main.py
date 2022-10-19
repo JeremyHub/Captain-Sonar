@@ -1,4 +1,4 @@
-from game.game import Game
+from game.game import Game, Phase
 import pygame as pg
 from game.observation import Observation, Public_Actions
 from actors.random_actor import Random_Actor
@@ -19,8 +19,8 @@ if __name__ == "__main__":
         while True:
             if done:
                 obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
-                p2 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
-                p1 = Expert_Actor(g. ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
+                p1 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
+                p2 = Expert_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
                 p1_total_dmg += g.p1.damage
                 p2_total_dmg += g.p2.damage
                 g = Game(does_draw)
@@ -40,8 +40,10 @@ if __name__ == "__main__":
             if should_print: print("action: ", action)
             obs, reward, done = g.step(action)
             if does_draw:
-                g.pg_draw_points(p1.possible_opp_positions, (255,255,255), 10)
+                g.pg_draw_points(p2.possible_opp_positions, (255,255,255), 10)
                 pg.display.flip()
+                # if g.phase == Phase.Movement:
+                #     input()
             if should_print: print("obs: ", obs)
             if should_print: print("reward: ", reward)
             if should_print: print("done: ", done)

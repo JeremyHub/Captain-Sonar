@@ -124,7 +124,7 @@ class Game:
                 else:
                     if action == Power.Silence:
                         self.player.last_actions.silence_used = 1
-                        return [], 0, True
+                        # return [], 0, True
                     elif action == Power.Torpedo:
                         self.player.last_actions.torpedo_used = 1
                     else:
@@ -134,8 +134,10 @@ class Game:
             self.player.move(action)
             self.declared_direction = action
             if action is None:
+                # return [], 0, True
                 self.player.last_actions.direction_moved = 0
             else:
+                assert isinstance(action, Direction)
                 self.player.last_actions.direction_moved = action.value
         elif self.phase == Phase.Breakdown:
             self.player.breakdown(action, self.declared_direction)
@@ -224,6 +226,8 @@ class Game:
                 self.player.last_actions = Public_Actions()
         elif self.power_to_aim:
             self.phase = Phase.Aim_Power
+        elif self.phase == Phase.Aim_Power:
+            self.phase = Phase.Choose_Power
         elif self.phase_num == len(self.PHASES)-1:
             self.player = self.opponent
             self.player.last_actions = Public_Actions()
@@ -246,7 +250,7 @@ class Game:
             self.player.last_actions.silence_dir = action[0].value
         elif power == Power.Torpedo:
             explosion_loc = action
-            self._explosion(explosion_loc)
+            # self._explosion(explosion_loc)
             self.player.last_actions.torpedo_row = explosion_loc[0]
             self.player.last_actions.torpedo_col = explosion_loc[1]
         else:
