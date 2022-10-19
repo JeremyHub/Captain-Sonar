@@ -1,6 +1,5 @@
 from enum import Enum
-from random import randint
-from typing import Any, Dict
+from typing import Any
 from game.action_dict import make_action_dict
 from game.observation import Observation, Public_Actions
 from game.sub import Sub
@@ -229,6 +228,7 @@ class Game:
             self.phase = self.PHASES[self.phase_num]
         else:
             if self.player.last_actions.silence_used and self.PHASES[self.phase_num+1] == Phase.Movement:
+                # this assumes there is a phase after movement, which is true
                 self.phase_num += 1
             self.phase_num += 1
             self.phase = self.PHASES[self.phase_num]

@@ -29,6 +29,7 @@ if __name__ == "__main__":
                 prev_num = num_games
             if should_print: print("---------------------------------------")
             if should_print: print("player: ", g.player.player)
+            p2.enemy_loc = g.p1.loc
             options = g.legal_actions()
             if g.to_play() == 1:
                 action = p1.choose_action(options, obs)

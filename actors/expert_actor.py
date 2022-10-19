@@ -28,6 +28,7 @@ class Expert_Actor(Actor):
     def _choose_action(self, actions: list[int], obs: list[int]):
 
         self._update_possible_enemy_locs(obs)
+        assert self.enemy_loc in self.possible_opp_positions
 
         # if its choose power phase
         if obs[4] == 2:
@@ -103,6 +104,8 @@ class Expert_Actor(Actor):
                     to_remove.add(loc)
         self.possible_opp_positions -= to_remove
 
+        assert self.possible_opp_positions, "there should always be at least one spot where it could be"
+
 
     def _update_possible_locs(self, obs):
         old_possible_locs = set(self.possible_opp_positions)
@@ -124,6 +127,7 @@ class Expert_Actor(Actor):
                 self.possible_opp_positions.remove(loc)
                 if Sub.in_bounds(new_loc[0], new_loc[1], self.board) and self.board[new_loc[0]][new_loc[1]] == 0:
                     self.possible_opp_positions.add(new_loc)
+
             if opp_silence_used:
                 new_possible_positions = set()
                 for dir, num_moved in Sub.get_silence_options(loc, self.board, [], [Direction(opp_silence_dir)]): # can make better by adding possible paths for every possible loc
