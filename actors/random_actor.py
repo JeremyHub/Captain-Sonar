@@ -5,8 +5,8 @@ from actors.actor import Actor
 
 class Random_Actor(Actor):
     
-    def __init__(self, action_dict: dict[Any, int], reverse_action_dict: dict[int, Any]):
-        super().__init__(action_dict, reverse_action_dict)
+    def __init__(self, action_dict: dict[Any, int], reverse_action_dict: dict[int, Any], board: tuple[tuple[int]]):
+        super().__init__(action_dict, reverse_action_dict, board)
 
 
     def _choose_action(self, actions: list[int], obs: list[int]):
@@ -15,4 +15,4 @@ class Random_Actor(Actor):
             action = randint(1,len(actions)-1)
         else:
             action = randint(0,len(actions)-1)
-        return action
+        return actions[action]

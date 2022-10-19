@@ -8,7 +8,7 @@ class Actor:
         self.reverse_action_dict = reverse_action_dict
         self.action_history = []
         self.obs_history = []
-        self.first_phase_obs_history = []
+        self.unexamined_first_phase_obs = []
         self.last_phase_num = 2
         self.board = board
 
@@ -17,7 +17,7 @@ class Actor:
         #    this works becuase there will always be a choose power at the start of your turn and at the end of your turn
         #       even if you choose a power at the end, there will be a choose power again until you dont choose a power to let you do multiple powers
         if self.last_phase_num == 2 and obs[4] == 2:
-            self.first_phase_obs_history.append(obs)
+            self.unexamined_first_phase_obs.append(obs)
         self.last_phase_num = obs[4]
 
         self.obs_history.append(obs)

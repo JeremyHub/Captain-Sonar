@@ -121,7 +121,7 @@ class Game:
                 self.player.powers[action] = 0
                 if action == Power.Drone:
                     self.player.last_actions.drone_used = 1
-                    observation.opp_quadrant = self.opponent.get_quadrant()
+                    observation.opp_quadrant = self.opponent.get_current_quadrant()
                 else:
                     if action == Power.Silence:
                         self.player.last_actions.silence_used = 1
@@ -186,6 +186,9 @@ class Game:
             actions = actions
         elif self.phase == Phase.Choose_Power:
             actions = self.player.get_active_powers()
+            if self.player.last_actions.direction_moved not in [-1, 0]:
+                if Power.Silence in actions:
+                    actions.remove(Power.Silence)
         elif self.phase == Phase.Movement:
             actions = self.player.get_valid_directions()
         elif self.phase == Phase.Breakdown:
@@ -226,6 +229,8 @@ class Game:
             self.phase_num = 0
             self.phase = self.PHASES[self.phase_num]
         else:
+            if self.player.last_actions.silence_used and self.PHASES[self.phase_num+1] == Phase.Movement:
+                self.phase_num += 1
             self.phase_num += 1
             self.phase = self.PHASES[self.phase_num]
 

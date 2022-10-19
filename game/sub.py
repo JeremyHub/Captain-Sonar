@@ -39,7 +39,7 @@ class Sub:
             self.remaining_surface_turns -= 1
         else:
             self.path.append(self.loc)
-            self.loc = self._get_coord_in_direction(self.loc, direction)
+            self.loc = self.get_coord_in_direction(self.loc, direction)
         assert self.board[self.loc[0]][self.loc[1]] == 0, "trying to move to an island"
 
     
@@ -103,8 +103,8 @@ class Sub:
         if self.remaining_surface_turns:
             return valid_directions
         for direction in Direction:
-            row,col = self._get_coord_in_direction(self.loc, direction)
-            if self._in_bounds(row, col):
+            row,col = self.get_coord_in_direction(self.loc, direction)
+            if self.in_bounds(row, col, self.board):
                 if self.board[row][col] == 0 and (row,col) not in self.path:
                     valid_directions.append(direction)
         return valid_directions
@@ -120,13 +120,17 @@ class Sub:
     def get_power_options(self, power):
         options = []
         if power == Power.Silence:
-            options = self._get_silence_options()
+            options = self.get_silence_options(self.loc, self.board, self.path)
         elif power == Power.Torpedo:
-            options = self._get_torpedo_options()
+            options = self.get_torpedo_options(self.loc, self.board)
         else:
             raise Exception("power not found")
         assert options, "no options for aiming power"
         return options
+
+
+    def get_current_quadrant(self):
+        return self.get_quadrant(self.loc, self.board)
 
 
     @classmethod
@@ -136,42 +140,45 @@ class Sub:
         return col_half + 2*row_half
 
 
-    def _get_silence_options(self):
+    @classmethod
+    def get_silence_options(cls, origin_loc, board, path, possible_directions = Direction):
         options = []
-        for dir in Direction:
-            loc = self.loc
+        for dir in possible_directions:
+            loc = origin_loc
             for i in range(4):
-                row_dir, col_dir = self._get_coord_in_direction(loc, dir)
-                if self._in_bounds(row_dir, col_dir) and self.board[row_dir][col_dir] == 0 and (row_dir, col_dir) not in self.path:
+                row_dir, col_dir = Sub.get_coord_in_direction(loc, dir)
+                if Sub.in_bounds(row_dir, col_dir, board) and board[row_dir][col_dir] == 0 and (row_dir, col_dir) not in path:
                     options.append((dir, i))
                     loc = (row_dir, col_dir)
                 else:
                     break
         return options
 
+    @classmethod
+    def in_bounds(cls, row, col, board):
+        return 0 <= row < len(board) and 0 <= col < len(board[0])
 
-    def _in_bounds(self, row, col):
-        return 0 <= row < len(self.board) and 0 <= col < len(self.board[0])
 
-
-    def _get_torpedo_options(self):
+    @classmethod
+    def get_torpedo_options(self, loc, board):
         options = []
-        to_check = [self.loc]
+        to_check = [loc]
         for _ in range(4):
             to_add = []
             for option in to_check:
                 for dir in Direction:
-                    loc = self._get_coord_in_direction(option, dir)
+                    loc = Sub.get_coord_in_direction(option, dir)
                     if loc in options:
                         continue
-                    if self._in_bounds(loc[0], loc[1]) and self.board[loc[0]][loc[1]] == 0:
+                    if Sub.in_bounds(loc[0], loc[1], board) and board[loc[0]][loc[1]] == 0:
                         options.append(loc)
                         to_add.append(loc)
             to_check = to_add
         return options
 
     
-    def _get_coord_in_direction(self, loc, direction):
+    @classmethod
+    def get_coord_in_direction(cls, loc, direction):
         dir_col, dir_row = DIRECTION_COORDS[direction]
         row = loc[0] + dir_row
         col = loc[1] + dir_col

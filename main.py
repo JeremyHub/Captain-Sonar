@@ -11,14 +11,20 @@ if __name__ == "__main__":
     should_print = False
     g = Game(does_draw)
     num_games = 0
-    p1 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     p1_total_dmg = 0
-    p2 = Expert_Actor(g. ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     p2_total_dmg = 0
     obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
     prev_num = -1
+    done = True
     try:
         while True:
+            if done:
+                p1 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
+                p2 = Expert_Actor(g. ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
+                p1_total_dmg += g.p1.damage
+                p2_total_dmg += g.p2.damage
+                g = Game(does_draw)
+                num_games += 1
             if not num_games % 100 and not num_games == prev_num:
                 print(num_games)
                 prev_num = num_games
@@ -32,15 +38,10 @@ if __name__ == "__main__":
             if should_print: print("phase: ", g.phase)
             if should_print: print("options: ", options)
             if should_print: print("action: ", action)
-            obs, reward, done = g.step(options[action])
+            obs, reward, done = g.step(action)
             if should_print: print("obs: ", obs)
             if should_print: print("reward: ", reward)
             if should_print: print("done: ", done)
-            if done:
-                p1_total_dmg += g.p1.damage
-                p2_total_dmg += g.p2.damage
-                g = Game(does_draw)
-                num_games += 1
     finally:
         print(num_games)
         print("p1 total dmg: ", p1_total_dmg)

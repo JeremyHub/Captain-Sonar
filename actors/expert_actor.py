@@ -3,21 +3,22 @@ from typing import Any
 
 from game.breakdowns import BreakdownChannel, BreakdownMap
 from actors.actor import Actor
+from game.constants import Direction, Power
 from game.sub import Sub
 
 
 class Expert_Actor(Actor):
     
-    def __init__(self, action_dict: dict[Any, int], reverse_action_dict: dict[int, Any]):
-        super().__init__(action_dict, reverse_action_dict)
+    def __init__(self, action_dict: dict[Any, int], reverse_action_dict: dict[int, Any], board: tuple[tuple[int]]):
+        super().__init__(action_dict, reverse_action_dict, board)
         self.breakdowns_on_paths = set()
         self.breakdowns = BreakdownMap()
         self.examined_obs = set()
 
-        self.possible_positions: set[tuple[int, int]] = set()
+        self.possible_opp_positions: set[tuple[int, int]] = set()
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
-                self.possible_positions.add((row, col))
+                self.possible_opp_positions.add((row, col))
 
         for breakdown in self.breakdowns.all_breakdowns:
             if breakdown.channel not in [BreakdownChannel.No_Channel, BreakdownChannel.Radiation]:
@@ -25,25 +26,40 @@ class Expert_Actor(Actor):
 
 
     def _choose_action(self, actions: list[int], obs: list[int]):
+
+        self._update_possible_enemy_locs(obs)
+
+        # if its choose power phase
+        if obs[4] == 2:
+            if self.action_dict[Power.Torpedo] in actions:
+                torpedo_options = Sub.get_torpedo_options((obs[2], obs[3]), self.board) # TODO: account for splash dmg
+                for option in torpedo_options:
+                    if self._in_torpedo_range(option, (obs[2], obs[3])):
+                        continue
+                    if option in self.possible_opp_positions:
+                        return self.action_dict[Power.Torpedo]
+                actions.remove(self.action_dict[Power.Torpedo])
+
         # if its aim power phase
         if obs[4] == 3 and len(actions) > 1:
             # if its torpedo
             if isinstance(self.reverse_action_dict[actions[1]][0], int):
-                should_continue = False
-                for index, action in enumerate(actions):
+
+                # the below is legacy code for picking a place to send the torpedo that doesnt kill you
+                # for action in actions:
+                #     loc = self.reverse_action_dict[action]
+                #     if not self._in_torpedo_range(loc, (obs[2], obs[3])):
+                #         return action
+
+                for action in actions:
                     loc = self.reverse_action_dict[action]
-                    should_continue = False
-                    for i in range(-1,2):
-                        for j in range(-1,2):
-                            if loc[0]+i == obs[2] and loc[1]+j == obs[3]: should_continue = True
-                            if should_continue: continue
-                        if should_continue: continue
-                    if should_continue: continue
-                    return index
+                    if loc in self.possible_opp_positions and not self._in_torpedo_range(loc, (obs[2], obs[3])):
+                        return action
+                raise Exception("should know there is a place to hit when activating a torpedo")
+
         # if its mov phase
         elif obs[4] == 4 and len(actions) > 1:
-            # TODO: build a model of where the enemy sub could be
-            # use that model to get an average position of all the posiblities
+            # TODO: use that model to get an average position of all the posiblities
             # use the std variation as a confidence
             # use that confidence as a weight for how much to weigh decideing to go in that direction
             # take that score in conjunction with the breakdowns to decide which direction to go
@@ -64,41 +80,72 @@ class Expert_Actor(Actor):
                     best_dir = key
             # if we will take damage, surface instead
             if least_marked in [1,-1]:
-                return 0
-            return best_dir
+                return actions[0]
+            return actions[best_dir]
+
         # if its the breadkown phase
         elif obs[4] == 5 and len(actions) > 1:
             # priotitize breakdowns that are part of channels so we can increase clearing
             for i, action in enumerate(actions):
                 if self.reverse_action_dict[action] in self.breakdowns_on_paths:
-                    return i
-        # TODO: use the model of where the sub is to decide where to fire a torpedo
-        # TODO: choose to fire a torpedo only when a possiblity is within range
+                    return actions[i]
         if len(actions) > 1 and obs and obs[4] in [4, 2]:
             action = randint(1,len(actions)-1)
         else:
             action = randint(0,len(actions)-1)
-        return action
+        return actions[action]
 
 
-    def _get_possible_enemy_locs(self):
-        unexamined_obs = []
-        for obs in self.first_phase_obs_history:
-            if obs in self.examined_obs: continue
-            unexamined_obs.append(obs)
-        
-        for obs in unexamined_obs:
-            opp_quadrant = obs[5]
-            opp_action = obs[6]
+    def _update_possible_enemy_locs(self, current_obs):
 
-            opp_torpedo_used = obs[7]
-            opp_torpedo_row = obs[8]
-            opp_torpedo_col = obs[9]
+        for obs in self.unexamined_first_phase_obs:
+            self._update_possible_locs(obs)
+        self.unexamined_first_phase_obs = []
 
-            opp_silence_used = obs[10]
-            opp_silence_dir = obs[11]
-            
-            for loc in self.possible_positions:
-                if not opp_quadrant == -1:
-                    if not opp_quadrant == Sub.get_quadrant(loc, self.board):
-                        self.possible_positions.remove(loc)
+        opp_quadrant = current_obs[5]
+        to_remove = set()
+        if not opp_quadrant == -1:
+            for loc in self.possible_opp_positions:
+                if not opp_quadrant == Sub.get_quadrant(loc, self.board):
+                    to_remove.add(loc)
+        self.possible_opp_positions -= to_remove
+
+
+    def _update_possible_locs(self, obs):
+        old_possible_locs = set(self.possible_opp_positions)
+
+        opp_dir = obs[6]
+
+        opp_torpedo_used = obs[7] # TODO: make better by using these
+        opp_torpedo_row = obs[8]
+        opp_torpedo_col = obs[9]
+
+        opp_silence_used = obs[10]
+        opp_silence_dir = obs[11]
+
+        for loc in old_possible_locs:
+            # 0 for silence, -1 for starting/silenced, 1,2,3,4 for directions
+            assert not ((opp_dir > 0) and opp_silence_used), "should not be able to move and silence in the same turn"
+            if opp_dir > 0:
+                new_loc = Sub.get_coord_in_direction(loc, Direction(opp_dir))
+                self.possible_opp_positions.remove(loc)
+                if Sub.in_bounds(new_loc[0], new_loc[1], self.board) and self.board[new_loc[0]][new_loc[1]] == 0:
+                    self.possible_opp_positions.add(new_loc)
+            if opp_silence_used:
+                new_possible_positions = set()
+                for dir, num_moved in Sub.get_silence_options(loc, self.board, [], [Direction(opp_silence_dir)]): # TODO: can make better by adding possible paths for every possible loc
+                    new_loc = loc
+                    for _ in range(num_moved):
+                        new_loc = Sub.get_coord_in_direction(new_loc, dir)
+                    new_possible_positions.add(new_loc)
+                self.possible_opp_positions = new_possible_positions
+
+
+    def _in_torpedo_range(self, loc1, loc2):
+        should_continue = False
+        for i in range(-1,2):
+            for j in range(-1,2):
+                if loc1[0]+i == loc2[0] and loc1[1]+j == loc2[1]: should_continue = True
+                if should_continue: continue
+            if should_continue: continue
+        return should_continue
