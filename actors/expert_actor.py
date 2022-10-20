@@ -45,7 +45,7 @@ class Expert_Actor(Actor):
         if obs[4] == 3 and len(actions) > 1:
             # if its torpedo
             test_action = self.reverse_action_dict[actions[1]]
-            if isinstance(test_action, tuple) and len(test_action) == 2:
+            if isinstance(test_action, tuple) and len(test_action) == 2 and isinstance(test_action[0], int):
                 for action in actions:
                     loc = self.reverse_action_dict[action]
                     if not self._in_torpedo_range(loc, (obs[2], obs[3])):
@@ -64,6 +64,7 @@ class Expert_Actor(Actor):
             for i, action in enumerate(actions):
                 direction = self.reverse_action_dict[action]
                 for breakdown, marked in zip(self.breakdowns.all_breakdowns, obs[13:(13+len(self.breakdowns.all_breakdowns))]):
+                    assert marked in [0,1]
                     if not marked:
                         if breakdown.direction_class == direction:
                             num_marked[i] = num_marked.get(i, 0) + 1

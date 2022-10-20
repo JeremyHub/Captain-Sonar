@@ -150,7 +150,6 @@ class Game:
             raise Exception("phase not found")
         reward = self.opponent.damage - self.player.damage
         done = self.player.damage >= 4 or self.opponent.damage >= 4
-        observation.phase_num = self.phase.value
         self.next_phase()
         self._update_observation(observation)
         if self.does_draw:
@@ -168,6 +167,7 @@ class Game:
         obs.row = self.player.loc[0]
         obs.col = self.player.loc[1]
         obs.opp_actions = self.opponent.last_actions
+        obs.phase_num = self.phase.value
         obs.power_marks = list(self.player.powers.values())
 
         obs.breakdowns = []
