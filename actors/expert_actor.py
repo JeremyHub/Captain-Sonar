@@ -1,8 +1,9 @@
+from queue import PriorityQueue
 from random import randint
 from turtle import pos
 from typing import Any
 
-from game.breakdowns import BreakdownChannel, BreakdownMap
+from game.breakdowns import BreakdownChannel, BreakdownMap, BreakdownType
 from actors.actor import Actor
 from game.constants import DIRECTION_COORDS, Direction, Power
 from game.sub import Sub
@@ -12,7 +13,6 @@ class Expert_Actor(Actor):
     
     def __init__(self, action_dict: dict[Any, int], reverse_action_dict: dict[int, Any], board: tuple[tuple[int]]):
         super().__init__(action_dict, reverse_action_dict, board)
-        self.breakdowns_on_paths = set()
         self.breakdowns = BreakdownMap()
         self.examined_obs = set()
         self.average_enemy_loc = (-1,-1)
@@ -22,10 +22,6 @@ class Expert_Actor(Actor):
             for col in range(len(self.board[row])):
                 if self.board[row][col] == 0:
                     self.possible_opp_positions.add((row, col))
-
-        for breakdown in self.breakdowns.all_breakdowns:
-            if breakdown.channel not in [BreakdownChannel.No_Channel, BreakdownChannel.Radiation]:
-                self.breakdowns_on_paths.add(breakdown)
 
 
     def _choose_action(self, actions: list[int], obs: list[int]):
@@ -105,9 +101,22 @@ class Expert_Actor(Actor):
         # if its the breadkown phase
         elif obs[4] == 5 and len(actions) > 1:
             # priotitize breakdowns that are part of channels so we can increase clearing
-            for i, action in enumerate(actions):
-                if self.reverse_action_dict[action] in self.breakdowns_on_paths:
-                    return actions[i]
+            good_breakdowns = []
+            for action in actions:
+                if not self.reverse_action_dict[action].channel == BreakdownChannel.No_Channel:
+                    good_breakdowns.append((2, action))
+                    if not self.reverse_action_dict[action].channel == BreakdownChannel.Radiation:
+                        good_breakdowns.append((1, action))
+                        if not self.reverse_action_dict[action].type == BreakdownType.Red:
+                            good_breakdowns.append((0, action))
+                            if not self.reverse_action_dict[action].type == BreakdownType.Radiation:
+                                return action
+            if good_breakdowns:
+                good_breakdowns.sort(key = lambda x: x[0])
+                return good_breakdowns[0][1]
+
+        # if we get to here just do something random
+        # if its mov or power phase dont do nothing
         if len(actions) > 1 and obs and obs[4] in [4, 2]:
             action = randint(1,len(actions)-1)
         else:
