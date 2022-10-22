@@ -1,9 +1,10 @@
 from random import randint
+from turtle import pos
 from typing import Any
 
 from game.breakdowns import BreakdownChannel, BreakdownMap
 from actors.actor import Actor
-from game.constants import Direction, Power
+from game.constants import DIRECTION_COORDS, Direction, Power
 from game.sub import Sub
 
 
@@ -14,6 +15,7 @@ class Expert_Actor(Actor):
         self.breakdowns_on_paths = set()
         self.breakdowns = BreakdownMap()
         self.examined_obs = set()
+        self.average_enemy_loc = (-1,-1)
 
         self.possible_opp_positions: set[tuple[int, int]] = set()
         for row in range(len(self.board)):
@@ -42,42 +44,63 @@ class Expert_Actor(Actor):
                 actions.remove(self.action_dict[Power.Torpedo])
 
         # if its aim power phase
-        if obs[4] == 3 and len(actions) > 1:
+        elif obs[4] == 3 and len(actions) > 1:
             # if its torpedo
             test_action = self.reverse_action_dict[actions[1]]
             if isinstance(test_action, tuple) and len(test_action) == 2 and isinstance(test_action[0], int):
+                possibilities = []
                 for action in actions:
                     loc = self.reverse_action_dict[action]
                     if not self._in_torpedo_range(loc, (obs[2], obs[3])):
-                        return action
+                        possibilities.append((action, loc))
+                for possibility, loc in possibilities:
+                    if loc in self.possible_opp_positions:
+                        return possibility
                 raise Exception("should know there is a place to hit when activating a torpedo")
 
         # if its mov phase
         elif obs[4] == 4 and len(actions) > 1:
-            # TODO: use that model to get an average position of all the posiblities
-            # use the std variation as a confidence
+            # TODO: use the std variation as a confidence
             # use that confidence as a weight for how much to weigh decideing to go in that direction
             # take that score in conjunction with the breakdowns to decide which direction to go
 
+            avg_point = self._get_average_point(self.possible_opp_positions)
+            self.average_enemy_loc = avg_point
+            vector_to_avg_enemy_pos = ((obs[2] - avg_point[0]), (obs[3] - avg_point[1]))
+
             # choose the direction with the least breakdowns
             num_marked = {}
-            for i, action in enumerate(actions):
+            for action in actions:
                 direction = self.reverse_action_dict[action]
                 for breakdown, marked in zip(self.breakdowns.all_breakdowns, obs[13:(13+len(self.breakdowns.all_breakdowns))]):
                     assert marked in [0,1]
                     if not marked:
                         if breakdown.direction_class == direction:
-                            num_marked[i] = num_marked.get(i, 0) + 1
-            least_marked = -1
-            best_dir = None
+                            num_marked[direction] = num_marked.get(direction, 0) + 1
+            best_dirs = []
+            most_unmarked = -1
             for key, val in num_marked.items():
-                if val > least_marked:
-                    least_marked = val
-                    best_dir = key
+                if val > most_unmarked:
+                    most_unmarked = val
+                    best_dirs = [key]
+                elif val == most_unmarked:
+                    best_dirs.append(key)
             # if we will take damage, surface instead
-            if least_marked in [1,-1]:
+            if most_unmarked in [1,-1]:
                 return actions[0]
-            return actions[best_dir]
+            
+            best_dirs_in_direction = []
+            for dir in best_dirs:
+                dir_vector = DIRECTION_COORDS[dir]
+                if dir_vector == vector_to_avg_enemy_pos:
+                    return self.action_dict[dir]
+                elif (dir_vector[0] == vector_to_avg_enemy_pos[0] and not dir_vector[0] == 0) or (dir_vector[1] == vector_to_avg_enemy_pos[1] and not dir_vector[1] == 0):
+                    best_dirs_in_direction.append((1,dir))
+                else:
+                    best_dirs_in_direction.append((0,dir))
+            best_dirs_in_direction.sort(key=lambda x: x[0], reverse=True)
+            if best_dirs_in_direction:
+                return self.action_dict[best_dirs_in_direction[0][1]]
 
         # if its the breadkown phase
         elif obs[4] == 5 and len(actions) > 1:
@@ -99,10 +122,15 @@ class Expert_Actor(Actor):
         self.unexamined_first_phase_obs = []
 
         opp_quadrant = current_obs[5]
+        opp_surface_quadrant = current_obs[11]
+
+        if opp_quadrant > -1 and opp_surface_quadrant > -1:
+            assert opp_quadrant == opp_surface_quadrant, "surface quadrant and drone quadrant should match"
         to_remove = set()
-        if not opp_quadrant == -1:
+        if not opp_quadrant == -1 or not opp_surface_quadrant == -1:
+            quad = opp_quadrant if not opp_quadrant == -1 else opp_surface_quadrant
             for loc in self.possible_opp_positions:
-                if not opp_quadrant == Sub.get_quadrant(loc, self.board):
+                if not quad == Sub.get_quadrant(loc, self.board):
                     to_remove.add(loc)
         self.possible_opp_positions -= to_remove
 
@@ -118,7 +146,6 @@ class Expert_Actor(Actor):
         opp_torpedo_col = obs[9]
 
         opp_silence_used = obs[10]
-        opp_silence_dir = obs[11]
 
         new_possible_positions = set()
 
@@ -132,7 +159,7 @@ class Expert_Actor(Actor):
 
             elif opp_silence_used:
                 assert opp_dir == -1, "opp silence true but dir was not -1"
-                for dir, num_moved in Sub.get_silence_options(loc, self.board, [], [Direction(opp_silence_dir)]): # can make better by adding possible paths for every possible loc
+                for dir, num_moved in Sub.get_silence_options(loc, self.board, []): # can make better by adding possible paths for every possible loc
                     new_loc = loc
                     for _ in range(num_moved):
                         new_loc = Sub.get_coord_in_direction(new_loc, dir)
@@ -141,7 +168,7 @@ class Expert_Actor(Actor):
             else:
                 # the sub was sufraced
                 assert opp_dir == 0, "didnt move or use silence but didnt surface"
-                new_possible_positions = self.possible_opp_positions
+                return
 
         self.possible_opp_positions = new_possible_positions
 
@@ -154,3 +181,12 @@ class Expert_Actor(Actor):
                 if should_continue: continue
             if should_continue: continue
         return should_continue
+
+
+    def _get_average_point(self, points):
+        total_x = 0
+        total_y = 0
+        for x, y in points:
+            total_x += x
+            total_y += y
+        return (total_x/len(points), total_y/len(points))

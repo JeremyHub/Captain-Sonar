@@ -17,7 +17,7 @@ class Public_Actions:
     torpedo_row: int = -1
     torpedo_col: int = -1
     silence_used: int = 0
-    silence_dir: int = -1
+    surface_quadrant: int = -1
     drone_used: int = 0
 
     def get_obs_arr(self):

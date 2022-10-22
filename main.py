@@ -1,3 +1,5 @@
+from audioop import avg
+import math
 from game.game import Game, Phase
 import pygame as pg
 from game.observation import Observation, Public_Actions
@@ -5,12 +7,14 @@ from actors.random_actor import Random_Actor
 from actors.expert_actor import Expert_Actor
 
 if __name__ == "__main__":
-    does_draw = False
-    # does_draw = True
+    # does_draw = False
+    does_draw = True
     # should_print = True
     should_print = False
     g = Game(does_draw)
     num_games = 0
+    num_turns = 0
+    all_num_turns = []
     p1_total_dmg = 1
     p2_total_dmg = 1
     prev_num = -1
@@ -25,6 +29,8 @@ if __name__ == "__main__":
                 p2_total_dmg += g.p2.damage
                 g = Game(does_draw)
                 num_games += 1
+                all_num_turns.append(num_turns)
+                num_turns = 0
             if not num_games % 100 and not num_games == prev_num:
                 print(num_games)
                 prev_num = num_games
@@ -39,8 +45,11 @@ if __name__ == "__main__":
             if should_print: print("options: ", options)
             if should_print: print("action: ", action)
             obs, reward, done = g.step(action)
+            if g.phase == Phase.Movement:
+                num_turns += 1
             if does_draw:
                 g.pg_draw_points(p2.possible_opp_positions, (255,255,255), 10)
+                g.pg_draw_points([p2.average_enemy_loc], (0,128,128), 0)
                 pg.display.flip()
                 # if g.phase == Phase.Movement:
                 #     input()
@@ -52,4 +61,5 @@ if __name__ == "__main__":
         print("p1 total dmg: ", p1_total_dmg)
         print("p2 total dmg: ", p2_total_dmg)
         print("ratio: ", p1_total_dmg/p2_total_dmg)
+        print("avg turns: ", sum(all_num_turns)/len(all_num_turns))
         pg.quit()

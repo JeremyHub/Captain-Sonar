@@ -135,6 +135,7 @@ class Game:
             self.declared_direction = action
             if action is None:
                 # return [], 0, True
+                self.player.last_actions.surface_quadrant = self.player.get_current_quadrant()
                 self.player.last_actions.direction_moved = 0
             else:
                 assert isinstance(action, Direction)
@@ -247,7 +248,6 @@ class Game:
         power = self.power_to_aim
         if power == Power.Silence:
             self.player.silence(action)
-            self.player.last_actions.silence_dir = action[0].value
         elif power == Power.Torpedo:
             explosion_loc = action
             self._explosion(explosion_loc)
