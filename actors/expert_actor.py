@@ -176,7 +176,7 @@ class Expert_Actor(Actor):
 
             else:
                 # the sub was sufraced
-                assert opp_dir == 0, "didnt move or use silence but didnt surface"
+                assert opp_dir == 0 or opp_dir == -1, "didnt move or use silence but didnt surface"
                 return
 
         self.possible_opp_positions = new_possible_positions

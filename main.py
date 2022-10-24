@@ -7,8 +7,8 @@ from actors.expert_actor import Expert_Actor
 if __name__ == "__main__":
     does_draw = False
     # does_draw = True
-    # should_print = True
     should_print = False
+    # should_print = True
     g = Game(does_draw)
     num_games = 0
     num_turns = 0
@@ -40,7 +40,7 @@ if __name__ == "__main__":
                 action = p2.choose_action(options, obs)
             if should_print: print("phase: ", g.phase)
             if should_print: print("options: ", options)
-            if should_print: print("action: ", action)
+            if should_print: print("action: ", g.REVERSE_ACTION_DICT[action])
             obs, reward, done = g.step(action)
             if g.phase == Phase.Movement:
                 num_turns += 1
@@ -54,6 +54,7 @@ if __name__ == "__main__":
             if should_print: print("reward: ", reward)
             if should_print: print("done: ", done)
     finally:
+        print("----------------------final stats-----------------------------")
         print(num_games)
         print("p1 total dmg: ", p1_total_dmg)
         print("p2 total dmg: ", p2_total_dmg)

@@ -24,3 +24,6 @@ class Actor:
         action = self._choose_action(actions, obs)
         self.action_history.append(action)
         return action
+
+    def _choose_action(actions, obs):
+        raise NotImplementedError("subclasses need to implement _choose_action")
