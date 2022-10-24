@@ -152,7 +152,7 @@ class Expert_Actor(Actor):
 
         opp_dir = obs[6]
 
-        opp_torpedo_used = obs[7] # TODO: make better by using these
+        opp_torpedo_used = obs[7] # TODO: make better by using these, the problem is we dont know if they used it before or after they moved
         opp_torpedo_row = obs[8]
         opp_torpedo_col = obs[9]
 
