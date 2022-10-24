@@ -30,7 +30,7 @@ if __name__ == "__main__":
                 all_num_turns.append(num_turns)
                 num_turns = 0
                 if not num_games % 100:
-                    print(num_games)
+                    print("games completed so far: ", num_games)
             if should_print: print("---------------------------------------")
             if should_print: print("player: ", g.player.player)
             options = g.legal_actions()
@@ -53,9 +53,11 @@ if __name__ == "__main__":
             if should_print: print("obs: ", obs)
             if should_print: print("reward: ", reward)
             if should_print: print("done: ", done)
+    except KeyboardInterrupt:
+        pass
     finally:
         print("----------------------final stats-----------------------------")
-        print(num_games)
+        print("total games finished: ", num_games)
         print("p1 total dmg: ", p1_total_dmg)
         print("p2 total dmg: ", p2_total_dmg)
         print("ratio: ", p1_total_dmg/p2_total_dmg)
