@@ -63,6 +63,7 @@ class Expert_Actor(Actor):
             avg_point = self._get_average_point(self.possible_opp_positions)
             self.average_enemy_loc = avg_point
             vector_to_avg_enemy_pos = ((obs[2] - avg_point[0]), (obs[3] - avg_point[1]))
+            vector_to_avg_enemy_pos = (round(vector_to_avg_enemy_pos[0]/abs(vector_to_avg_enemy_pos[0]+0.001)),round(vector_to_avg_enemy_pos[1]/abs(vector_to_avg_enemy_pos[1]+0.001)))
 
             # choose the direction with the least breakdowns
             num_marked = {}
