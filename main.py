@@ -23,6 +23,7 @@ if __name__ == "__main__":
         while True:
             if done:
                 obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
+                # TODO: everything breaks if there are two expert actors
                 p1 = Random_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
                 p2 = Expert_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
                 p1_total_dmg += g.p1.damage
