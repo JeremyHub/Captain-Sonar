@@ -101,6 +101,7 @@ class Expert_Actor(Actor):
         # if its the breadkown phase
         elif obs[4] == 5 and len(actions) > 1:
             # priotitize breakdowns that are part of channels so we can increase clearing
+            # also prioritize no red type breakdowns and no radiation
             good_breakdowns = []
             for action in actions:
                 if not self.reverse_action_dict[action].channel == BreakdownChannel.No_Channel:
