@@ -1,6 +1,4 @@
-from queue import PriorityQueue
 from random import randint
-from turtle import pos
 from typing import Any
 
 from game.breakdowns import BreakdownChannel, BreakdownMap, BreakdownType
