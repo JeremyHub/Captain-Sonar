@@ -1,5 +1,3 @@
-from audioop import avg
-import math
 from game.game import Game, Phase
 import pygame as pg
 from game.observation import Observation, Public_Actions
@@ -17,7 +15,6 @@ if __name__ == "__main__":
     all_num_turns = []
     p1_total_dmg = 1
     p2_total_dmg = 1
-    prev_num = -1
     done = True
     try:
         while True:
@@ -32,9 +29,8 @@ if __name__ == "__main__":
                 num_games += 1
                 all_num_turns.append(num_turns)
                 num_turns = 0
-            if not num_games % 100 and not num_games == prev_num:
-                print(num_games)
-                prev_num = num_games
+                if not num_games % 100:
+                    print(num_games)
             if should_print: print("---------------------------------------")
             if should_print: print("player: ", g.player.player)
             options = g.legal_actions()
