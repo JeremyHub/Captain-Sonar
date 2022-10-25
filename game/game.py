@@ -151,6 +151,14 @@ class Game:
             raise Exception("phase not found")
         reward = self.opponent.damage - self.player.damage
         done = self.player.damage >= 4 or self.opponent.damage >= 4
+        if done and self.does_draw:
+            if self.player.damage >= 4:
+                p = self.player
+            else:
+                p = self.opponent
+            pg.draw.circle(self.screen, (255,0,0), self._get_coord_center_on_board(p.loc), 50)
+            pg.display.flip()
+            pg.time.wait(1500)
         self.next_phase()
         self._update_observation(observation)
         if self.does_draw:
