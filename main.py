@@ -5,8 +5,8 @@ from actors.random_actor import Random_Actor
 from actors.expert_actor import Expert_Actor
 
 if __name__ == "__main__":
-    does_draw = False
-    # does_draw = True
+    # does_draw = False
+    does_draw = True
     should_print = False
     # should_print = True
     g = Game(does_draw)

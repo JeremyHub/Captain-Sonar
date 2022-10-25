@@ -25,6 +25,7 @@ class Sub:
         self.damage = 0
         self.remaining_surface_turns = 0
         self.last_actions = Public_Actions()
+        self.silences_on_path = []
 
     
     def set_starting_loc(self, loc: tuple[int, int]):
@@ -79,10 +80,10 @@ class Sub:
             cost = POWER_COSTS[power]
             assert marks <= cost and marks >= 0, "{} on {} power".format(marks, power)
             if marks == cost:
-                for breakdown in self.breakdownMap.type_map[POWER_TO_BREAKDOWN_TYPE[power]]:
-                    if breakdown.marked:
-                        break
-                else: # if above for loop does not break
+            #     for breakdown in self.breakdownMap.type_map[POWER_TO_BREAKDOWN_TYPE[power]]:
+            #         if breakdown.marked:
+            #             break
+            #     else: # if above for loop does not break
                     active.append(power)
         return active
 
@@ -207,5 +208,6 @@ class Sub:
     def _surface(self):
         assert self.remaining_surface_turns == 0, "trying to surface while already surfaced"
         self.path = []
+        self.silences_on_path = []
         self.breakdownMap = BreakdownMap()
         self.remaining_surface_turns = 3

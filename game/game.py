@@ -237,22 +237,30 @@ class Game:
         else:
             # stop players from moving if they silenced
             if self.player.last_actions.silence_used and self.PHASES[self.phase_num+1] == Phase.Movement:
-                # this assumes there is a phase after movement, which is true
+                # this assumes there are at least two phases after movement, which is true
                 self.phase_num += 1
             self.phase_num += 1
             self.phase = self.PHASES[self.phase_num]
 
 
     def handle_power(self, action):
-        # TODO: draw powers to screen
         power = self.power_to_aim
         if power == Power.Silence:
+            start_loc = self.player.loc
             self.player.silence(action)
+            end_loc = self.player.loc
+            if self.does_draw:
+                self.player.silences_on_path.append((start_loc, end_loc))
         elif power == Power.Torpedo:
             explosion_loc = action
             self._explosion(explosion_loc)
             self.player.last_actions.torpedo_row = explosion_loc[0]
             self.player.last_actions.torpedo_col = explosion_loc[1]
+            if self.does_draw:
+                pg.draw.circle(self.screen, (255, 0, 0), self._get_coord_center_on_board(explosion_loc), self.SCREEN_HEIGHT//len(self.board)//2)
+                pg.draw.line(self.screen, (0, 0, 0), self._get_coord_center_on_board(self.player.loc), self._get_coord_center_on_board(explosion_loc), self.SCREEN_HEIGHT//200)
+                pg.display.flip()
+                pg.time.wait(500)
         else:
             raise Exception("power not found")
 
@@ -265,6 +273,11 @@ class Game:
             prow, pcol = p.loc
             if abs(prow-row) <= 1 and abs(pcol-col) <= 1:
                 p.damage += 1
+
+
+    def _get_coord_center_on_board(self, loc):
+        y, x = loc
+        return (self._get_x_on_board(x)+self.SCREEN_WIDTH/150, self._get_y_on_board(y)+self.SCREEN_HEIGHT/80)
 
 
     def _get_x_on_board(self, x: int):
@@ -286,7 +299,10 @@ class Game:
         # update paths of subs
         for player, color, offset in l:
             self.pg_draw_points(player.path, color, offset)
-
+        # update paths of silences
+        for player, color, offset in l:
+            for loc1, loc2 in player.silences_on_path:
+                pg.draw.line(self.screen, color, self._get_coord_center_on_board(loc1), self._get_coord_center_on_board(loc2), self.SCREEN_HEIGHT//200)
     
     def pg_draw_points(self, points: list[tuple[int, int]], color: tuple[int, int, int], offset: float):
         for row, col in points:
