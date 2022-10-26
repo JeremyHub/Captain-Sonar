@@ -1,10 +1,12 @@
-class Game(AbstractGame):
+from game.game import CaptainSonar
+
+class CaptainSonar(AbstractGame):
     """
     Game wrapper.
     """
 
     def __init__(self, seed=None):
-        self.env = Presidents(seed)
+        self.env = CaptainSonar(seed)
 
     def step(self, action):
         """
@@ -73,8 +75,7 @@ class Game(AbstractGame):
         Returns:
             String representing the action.
         """
-        actions = actionDict
-        return f"{action_number}. {actions[action_number]}"
+        return f"{action_number}. {self.env.REVERSE_ACTION_DICT[action_number]}"
 
     def expert_agent(self):
         """

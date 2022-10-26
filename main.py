@@ -1,4 +1,4 @@
-from game.game import Game, Phase
+from game.game import CaptainSonar, Phase
 import pygame as pg
 from game.observation import Observation, Public_Actions
 from actors.random_actor import Random_Actor
@@ -9,7 +9,7 @@ if __name__ == "__main__":
     does_draw = True
     should_print = False
     # should_print = True
-    g = Game(does_draw)
+    g = CaptainSonar(does_draw)
     num_games = 0
     num_turns = 0
     all_num_turns = []
@@ -25,7 +25,7 @@ if __name__ == "__main__":
                 p2 = Expert_Actor(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
                 p1_total_dmg += g.p1.damage
                 p2_total_dmg += g.p2.damage
-                g = Game(does_draw)
+                g = CaptainSonar(does_draw)
                 num_games += 1
                 all_num_turns.append(num_turns)
                 num_turns = 0

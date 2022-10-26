@@ -22,7 +22,7 @@ class BoardNumDisplay(Enum):
     Powers = 2
 
 
-class Game:
+class CaptainSonar:
 
     PHASES = [Phase.Choose_Power, Phase.Movement, Phase.Breakdown, Phase.Mark_Power, Phase.Choose_Power]
     SCREEN_HEIGHT = 800
