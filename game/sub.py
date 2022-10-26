@@ -80,10 +80,10 @@ class Sub:
             cost = POWER_COSTS[power]
             assert marks <= cost and marks >= 0, "{} on {} power".format(marks, power)
             if marks == cost:
-            #     for breakdown in self.breakdownMap.type_map[POWER_TO_BREAKDOWN_TYPE[power]]:
-            #         if breakdown.marked:
-            #             break
-            #     else: # if above for loop does not break
+                for breakdown in self.breakdownMap.type_map[POWER_TO_BREAKDOWN_TYPE[power]]:
+                    if breakdown.marked:
+                        break
+                else: # if above for loop does not break
                     active.append(power)
         return active
 
