@@ -1,11 +1,9 @@
 from enum import Enum
 from typing import Any
 from game.action_dict import make_action_dict
-from game.breakdowns import BreakdownMap
 from game.observation import Observation, Public_Actions
 from game.sub import Sub
 from game.constants import Player, Direction, ALPHA_BOARD, Power
-import pygame as pg
 
 
 class Phase(Enum):
@@ -39,7 +37,7 @@ class CaptainSonar:
     declared_direction: Direction
     power_to_aim: Power
     does_draw: bool
-    screen: pg.Surface
+    screen: "pg.Surface"
     ACTION_DICT = dict[Any, int]
     REVERSE_ACTION_DICT = dict[Any, int]
     
@@ -50,8 +48,9 @@ class CaptainSonar:
         self.ACTION_DICT = make_action_dict(len(self.board), len(self.board[0]))
         self.REVERSE_ACTION_DICT = {v: k for k, v in self.ACTION_DICT.items()}
         if self.does_draw:
-            pg.init()
-            self.screen = pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            self.pg = __import__("pygame")
+            self.pg.init()
+            self.screen = self.pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
         self.reset()
 
 
@@ -81,15 +80,15 @@ class CaptainSonar:
 
 
     def setup_map(self, path):
-        board = pg.image.load(path).convert()
-        board = pg.transform.scale(board, (self.SCREEN_WIDTH//(self.BOARD_FRAC_OF_DISPLAY//2), self.SCREEN_HEIGHT))
+        board = self.pg.image.load(path).convert()
+        board = self.pg.transform.scale(board, (self.SCREEN_WIDTH//(self.BOARD_FRAC_OF_DISPLAY//2), self.SCREEN_HEIGHT))
         self.screen.blit(board, (0,0))
     
 
     def setup_boards(self, path, board_type):
         for height in [0, self.SCREEN_HEIGHT//2]:
-            breakdown = pg.image.load(path).convert()
-            breakdown = pg.transform.scale(breakdown, (self.SCREEN_WIDTH//self.BOARD_FRAC_OF_DISPLAY, self.SCREEN_HEIGHT//2))
+            breakdown = self.pg.image.load(path).convert()
+            breakdown = self.pg.transform.scale(breakdown, (self.SCREEN_WIDTH//self.BOARD_FRAC_OF_DISPLAY, self.SCREEN_HEIGHT//2))
             self.screen.blit(breakdown,(self._get_secondary_board_x(board_type), height))
 
 
@@ -103,7 +102,7 @@ class CaptainSonar:
         self._pg_update_powers()
         self._pg_update_damage()
         self._pg_update_player_pos_and_path()
-        pg.display.flip()
+        self.pg.display.flip()
 
 
     def to_play(self):
@@ -156,15 +155,15 @@ class CaptainSonar:
                 p = self.player
             else:
                 p = self.opponent
-            pg.draw.circle(self.screen, (255,0,0), self._get_coord_center_on_board(p.loc), 50)
-            pg.display.flip()
-            pg.time.wait(1500)
+            self.pg.draw.circle(self.screen, (255,0,0), self._get_coord_center_on_board(p.loc), 50)
+            self.pg.display.flip()
+            self.pg.time.wait(1500)
         self.next_phase()
         self._update_observation(observation)
         if self.does_draw:
-            for event in pg.event.get():
-                if event.type == pg.QUIT:
-                    pg.quit()
+            for event in self.pg.event.get():
+                if event.type == self.pg.QUIT:
+                    self.pg.quit()
                     raise KeyboardInterrupt()
             self.update_display()
         return observation.get_obs_arr(), reward, done
@@ -265,10 +264,10 @@ class CaptainSonar:
             self.player.last_actions.torpedo_row = explosion_loc[0]
             self.player.last_actions.torpedo_col = explosion_loc[1]
             if self.does_draw:
-                pg.draw.circle(self.screen, (255, 0, 0), self._get_coord_center_on_board(explosion_loc), self.SCREEN_HEIGHT//len(self.board)//2)
-                pg.draw.line(self.screen, (0, 0, 0), self._get_coord_center_on_board(self.player.loc), self._get_coord_center_on_board(explosion_loc), self.SCREEN_HEIGHT//200)
-                pg.display.flip()
-                pg.time.wait(500)
+                self.pg.draw.circle(self.screen, (255, 0, 0), self._get_coord_center_on_board(explosion_loc), self.SCREEN_HEIGHT//len(self.board)//2)
+                self.pg.draw.line(self.screen, (0, 0, 0), self._get_coord_center_on_board(self.player.loc), self._get_coord_center_on_board(explosion_loc), self.SCREEN_HEIGHT//200)
+                self.pg.display.flip()
+                self.pg.time.wait(500)
         else:
             raise Exception("power not found")
 
@@ -283,9 +282,9 @@ class CaptainSonar:
                 p.damage += 1
 
 
-    def _get_coord_center_on_board(self, loc):
+    def _get_coord_center_on_board(self, loc, offset=0):
         y, x = loc
-        return (self._get_x_on_board(x)+self.SCREEN_WIDTH/150, self._get_y_on_board(y)+self.SCREEN_HEIGHT/80)
+        return (self._get_x_on_board(x)+(self.SCREEN_WIDTH/150)+offset, self._get_y_on_board(y)+(self.SCREEN_HEIGHT/80)+offset)
 
 
     def _get_x_on_board(self, x: int):
@@ -302,29 +301,31 @@ class CaptainSonar:
         l = [(self.p1, self.P1_COLOR, 0), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT*0.008)]
         for player, color, offset in l:
             if player.loc:
-                rec = pg.Rect(x(player.loc[1])+offset, y(player.loc[0])+offset, self.SCREEN_WIDTH/80, self.SCREEN_HEIGHT/40)
-                pg.draw.rect(self.screen, color, rec)
+                rec = self.pg.Rect(x(player.loc[1])+offset, y(player.loc[0])+offset, self.SCREEN_WIDTH/80, self.SCREEN_HEIGHT/40)
+                self.pg.draw.rect(self.screen, color, rec)
         # update paths of subs
         for player, color, offset in l:
-            self.pg_draw_points(player.path, color, offset)
+            if len(player.path) > 1:
+                path = player.path
+                self.pg.draw.lines(self.screen, color, False, [self._get_coord_center_on_board(p, offset) for p in player.path+[player.loc]], self.SCREEN_HEIGHT//200)
         # update paths of silences
         for player, color, offset in l:
             for loc1, loc2 in player.silences_on_path:
-                pg.draw.line(self.screen, color, self._get_coord_center_on_board(loc1), self._get_coord_center_on_board(loc2), self.SCREEN_HEIGHT//200)
+                self.pg.draw.line(self.screen, color, self._get_coord_center_on_board(loc1), self._get_coord_center_on_board(loc2), self.SCREEN_HEIGHT//200)
     
     def pg_draw_points(self, points: list[tuple[int, int]], color: tuple[int, int, int], offset: float):
         for row, col in points:
-            rec = pg.Rect(self._get_x_on_board(col)+offset, self._get_y_on_board(row)+offset, self.SCREEN_WIDTH/160, self.SCREEN_HEIGHT/80)
-            pg.draw.rect(self.screen, color, rec)
+            rec = self.pg.Rect(self._get_x_on_board(col)+offset, self._get_y_on_board(row)+offset, self.SCREEN_WIDTH/160, self.SCREEN_HEIGHT/80)
+            self.pg.draw.rect(self.screen, color, rec)
 
 
     def _pg_update_damage(self):
         for damage, height, color in [(self.p1.damage, 0, self.P1_COLOR), (self.p2.damage, self.SCREEN_HEIGHT/2, self.P2_COLOR)]:
             x = self._get_secondary_board_x(BoardNumDisplay.Powers)*1.349
             for _ in range(damage):
-                rec = pg.Rect(x, height+self.SCREEN_HEIGHT*0.068, self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
+                rec = self.pg.Rect(x, height+self.SCREEN_HEIGHT*0.068, self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
                 x += rec.width + self.SCREEN_WIDTH*0.005
-                pg.draw.rect(self.screen, color, rec)
+                self.pg.draw.rect(self.screen, color, rec)
 
 
     def _pg_update_breakdowns(self):
@@ -351,8 +352,8 @@ class CaptainSonar:
                     prev_dir = dir
                     num_in_class = 0
                 if breakdown.marked:
-                    rec = pg.Rect(x(dir)+(direction_layouts[dir][num_in_class][1]*self.SCREEN_WIDTH*0.014), self.SCREEN_HEIGHT*0.285+height+(0.049*self.SCREEN_HEIGHT*direction_layouts[dir][num_in_class][0]), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
-                    pg.draw.rect(self.screen, color, rec)
+                    rec = self.pg.Rect(x(dir)+(direction_layouts[dir][num_in_class][1]*self.SCREEN_WIDTH*0.014), self.SCREEN_HEIGHT*0.285+height+(0.049*self.SCREEN_HEIGHT*direction_layouts[dir][num_in_class][0]), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
+                    self.pg.draw.rect(self.screen, color, rec)
                 num_in_class += 1
 
 
@@ -377,6 +378,6 @@ class CaptainSonar:
                 assert marks <= 6, "cant have more than 6 marks on one power"
                 for offset_num in range(1,marks+1,1):
                     x_offset_frac, y_offset_frac = mark_offsets[offset_num]
-                    rec = pg.Rect(x(power_locs[power][0])+(x_offset_frac*self.SCREEN_WIDTH), y(power_locs[power][1])+height+(y_offset_frac*self.SCREEN_HEIGHT), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
-                    pg.draw.rect(self.screen, color, rec)
+                    rec = self.pg.Rect(x(power_locs[power][0])+(x_offset_frac*self.SCREEN_WIDTH), y(power_locs[power][1])+height+(y_offset_frac*self.SCREEN_HEIGHT), self.SCREEN_WIDTH/100, self.SCREEN_HEIGHT/50)
+                    self.pg.draw.rect(self.screen, color, rec)
     
