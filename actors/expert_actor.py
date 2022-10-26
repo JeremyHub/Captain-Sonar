@@ -14,6 +14,9 @@ class Expert_Actor(Actor):
         self.breakdowns = BreakdownMap()
         self.examined_obs = set()
         self.average_enemy_loc = (-1,-1)
+        self.used_torpedo = False
+        self.used_torpedo_loc = None
+        self.prev_opp_dmg = None
 
         self.possible_opp_positions: set[tuple[int, int]] = set()
         for row in range(len(self.board)):
@@ -23,6 +26,11 @@ class Expert_Actor(Actor):
 
 
     def _choose_action(self, actions: list[int], obs: list[int]):
+
+        if self.unexamined_first_phase_obs:
+            self.used_torpedo = False
+            self.used_torpedo_loc = None
+            self.prev_opp_dmg = obs[1]
 
         self._update_possible_enemy_locs(obs)
 
@@ -49,6 +57,8 @@ class Expert_Actor(Actor):
                         possibilities.append((action, loc))
                 for possibility, loc in possibilities:
                     if loc in self.possible_opp_positions:
+                        self.used_torpedo = True
+                        self.used_torpedo_loc = loc
                         return possibility
                 raise Exception("should know there is a place to hit when activating a torpedo")
 
@@ -135,12 +145,30 @@ class Expert_Actor(Actor):
 
         if opp_quadrant > -1 and opp_surface_quadrant > -1:
             assert opp_quadrant == opp_surface_quadrant, "surface quadrant and drone quadrant should match"
+        
         to_remove = set()
+
         if not opp_quadrant == -1 or not opp_surface_quadrant == -1:
             quad = opp_quadrant if not opp_quadrant == -1 else opp_surface_quadrant
             for loc in self.possible_opp_positions:
                 if not quad == Sub.get_quadrant(loc, self.board):
                     to_remove.add(loc)
+
+        # TODO test this more
+        if self.used_torpedo:
+            diff_opp_dmg = current_obs[1] - self.prev_opp_dmg
+            if diff_opp_dmg > 0:
+                if diff_opp_dmg == 2:
+                    self.possible_opp_positions = set([self.used_torpedo_loc])
+                else:
+                    for loc in self.possible_opp_positions:
+                        if not self._in_torpedo_range(loc, self.used_torpedo_loc):
+                            to_remove.add(loc)
+            else:
+                for loc in self.possible_opp_positions:
+                    if self._in_torpedo_range(loc, self.used_torpedo_loc):
+                        to_remove.add(loc)
+
         self.possible_opp_positions -= to_remove
 
         assert self.possible_opp_positions, "there should always be at least one spot where it could be"
