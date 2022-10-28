@@ -37,7 +37,7 @@ class CaptainSonar:
     declared_direction: Direction
     power_to_aim: Power
     does_draw: bool
-    screen: "pg.Surface"
+    screen: Any # pg.surface
     ACTION_DICT = dict[Any, int]
     REVERSE_ACTION_DICT = dict[Any, int]
     
