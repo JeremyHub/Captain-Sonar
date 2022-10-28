@@ -9,7 +9,6 @@ def run_one_game(tuple_of_args):
     does_draw, should_print, actor1, actor2, game_num = tuple_of_args
     g = CaptainSonar(does_draw)
     obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
-    # TODO: everything breaks if the expert is the first one
     p1 = actor1(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     p2 = actor2(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     done = False
@@ -42,8 +41,8 @@ def run_one_game(tuple_of_args):
     return num_turns, g.p1.damage, g.p2.damage
 
 if __name__ == "__main__":
-    does_draw = False
-    # does_draw = True
+    # does_draw = False
+    does_draw = True
     should_print = False
     # should_print = True
 
@@ -54,27 +53,31 @@ if __name__ == "__main__":
     p2_total_dmg = 1
     p1_wins = 0
     p2_wins = 0
-    
-    if not does_draw:
+
+    if not does_draw and not should_print:
         pool = mp.Pool(processes=mp.cpu_count())
-        map_result = pool.map_async(run_one_game, [(does_draw, should_print, Random_Actor, Expert_Actor, i) for i in range(num_games)])
+        map_result = pool.map_async(run_one_game, [(does_draw, should_print, Expert_Actor, Random_Actor, i) for i in range(num_games)])
         result_log = map_result.get()
         pool.close()
     else:
         pg = __import__("pygame")
         result_log = []
-        for _ in range(num_games):
-            result_log.append(run_one_game((does_draw, should_print, Random_Actor, Expert_Actor, 0)))
+        # does_draw = False
+        # should_print = False
+        for i in range(num_games):
+            result_log.append(run_one_game((does_draw, should_print, Expert_Actor, Expert_Actor, i)))
 
     for num_turns, p1_dmg, p2_dmg in result_log:
         p1_total_dmg += p1_dmg
         p2_total_dmg += p2_dmg
         all_num_turns.append(num_turns)
         num_actual_games += 1
-        if p2_dmg == 4:
+        if p2_dmg >= 4:
             p1_wins += 1
-        elif p1_dmg == 4:
+        elif p1_dmg >= 4:
             p2_wins += 1
+        else:
+            raise Exception("game ended with no winner")
     print("----------------------final stats-----------------------------")
     print("total games finished: ", num_actual_games)
     print("p1 total dmg: ", p1_total_dmg)

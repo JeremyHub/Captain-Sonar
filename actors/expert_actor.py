@@ -45,6 +45,11 @@ class Expert_Actor(Actor):
                         return self.action_dict[Power.Torpedo]
                 actions.remove(self.action_dict[Power.Torpedo])
 
+        # if its mark power phase
+        elif obs[4] == 6:
+            if self.action_dict[Power.Torpedo] in actions:
+                return self.action_dict[Power.Torpedo]
+
         # if its aim power phase
         elif obs[4] == 3 and len(actions) > 1:
             # if its torpedo
@@ -118,9 +123,7 @@ class Expert_Actor(Actor):
                     if not self.reverse_action_dict[action].channel == BreakdownChannel.Radiation:
                         good_breakdowns.append((1, action))
                         if not self.reverse_action_dict[action].type == BreakdownType.Red:
-                            good_breakdowns.append((0, action))
-                            if not self.reverse_action_dict[action].type == BreakdownType.Radiation:
-                                return action
+                            return action
             if good_breakdowns:
                 good_breakdowns.sort(key = lambda x: x[0])
                 return good_breakdowns[0][1]
