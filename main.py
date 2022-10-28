@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     if not does_draw and not should_print:
         pool = mp.Pool(processes=mp.cpu_count())
-        map_result = pool.map_async(run_one_game, [(does_draw, should_print, Expert_Actor, Random_Actor, i) for i in range(num_games)])
+        map_result = pool.map_async(run_one_game, [(does_draw, should_print, Random_Actor, Expert_Actor, i) for i in range(num_games)])
         result_log = map_result.get()
         pool.close()
     else:
