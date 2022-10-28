@@ -117,11 +117,18 @@ class Expert_Actor(Actor):
             # priotitize breakdowns that are part of channels so we can increase clearing
             # also prioritize no red type breakdowns and no radiation
             good_breakdowns = []
+            
             for action in actions:
                 if not self.reverse_action_dict[action].channel == BreakdownChannel.No_Channel:
                     good_breakdowns.append((2, action))
                     if not self.reverse_action_dict[action].channel == BreakdownChannel.Radiation:
                         good_breakdowns.append((1, action))
+                        # check if marking this would mean all the other breakdowns in the channel are marked
+                        for breakdown, marked in zip(self.breakdowns.all_breakdowns, obs[13:(13+len(self.breakdowns.all_breakdowns))]):
+                            if breakdown.channel == self.reverse_action_dict[action].channel and not marked:
+                                break
+                        else:
+                            return action
                         if not self.reverse_action_dict[action].type == BreakdownType.Red:
                             return action
             if good_breakdowns:
