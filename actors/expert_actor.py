@@ -164,9 +164,9 @@ class Expert_Actor(Actor):
                 if not quad == Sub.get_quadrant(loc, self.board):
                     to_remove.add(loc)
 
-        # TODO test this more
         if self.used_torpedo:
             diff_opp_dmg = current_obs[1] - self.prev_opp_dmg
+            # if we hit the enemy
             if diff_opp_dmg > 0:
                 if diff_opp_dmg == 2:
                     self.possible_opp_positions = set([self.used_torpedo_loc])
@@ -174,6 +174,7 @@ class Expert_Actor(Actor):
                     for loc in self.possible_opp_positions:
                         if not self._in_torpedo_range(loc, self.used_torpedo_loc):
                             to_remove.add(loc)
+            # otherwise, the torpedo missed
             else:
                 for loc in self.possible_opp_positions:
                     if self._in_torpedo_range(loc, self.used_torpedo_loc):

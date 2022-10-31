@@ -46,7 +46,7 @@ if __name__ == "__main__":
     should_print = False
     # should_print = True
 
-    num_games = 30000
+    num_games = 10000
     num_actual_games = 0
     all_num_turns = []
     p1_total_dmg = 1
@@ -78,6 +78,8 @@ if __name__ == "__main__":
             p2_wins += 1
         else:
             raise Exception("game ended with no winner")
+
+
     print("----------------------final stats-----------------------------")
     print("total games finished: ", num_actual_games)
     print("p1 total dmg: ", p1_total_dmg)

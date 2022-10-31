@@ -310,8 +310,9 @@ class CaptainSonar:
                 self.pg.draw.lines(self.screen, color, False, [self._get_coord_center_on_board(p, offset) for p in player.path+[player.loc]], self.SCREEN_HEIGHT//200)
         # update paths of silences
         for player, color, offset in l:
+            offset += self.SCREEN_HEIGHT*0.008
             for loc1, loc2 in player.silences_on_path:
-                self.pg.draw.line(self.screen, color, self._get_coord_center_on_board(loc1), self._get_coord_center_on_board(loc2), self.SCREEN_HEIGHT//200)
+                self.pg.draw.line(self.screen, color, self._get_coord_center_on_board(loc1, offset), self._get_coord_center_on_board(loc2, offset), self.SCREEN_HEIGHT//200)
     
     def pg_draw_points(self, points: list[tuple[int, int]], color: tuple[int, int, int], offset: float):
         for row, col in points:
