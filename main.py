@@ -41,8 +41,8 @@ def run_one_game(tuple_of_args):
     return num_turns, g.p1.damage, g.p2.damage
 
 if __name__ == "__main__":
-    does_draw = False
-    # does_draw = True
+    # does_draw = False
+    does_draw = True
     should_print = False
     # should_print = True
 
