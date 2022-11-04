@@ -2,6 +2,7 @@ from game.game import CaptainSonar, Phase
 from game.observation import Observation, Public_Actions
 from actors.random_actor import Random_Actor
 from actors.expert_actor import Expert_Actor
+from actors.human_actor import Human_Actor
 import multiprocessing as mp
 
 
@@ -41,6 +42,7 @@ def run_one_game(tuple_of_args):
     return num_turns, g.p1.damage, g.p2.damage
 
 if __name__ == "__main__":
+    human_playing = True
     # does_draw = False
     does_draw = True
     should_print = False
@@ -54,9 +56,16 @@ if __name__ == "__main__":
     p1_wins = 0
     p2_wins = 0
 
+    if human_playing:
+        actor1 = Human_Actor
+        actor2 = Expert_Actor
+    else:
+        actor1 = Random_Actor
+        actor2 = Expert_Actor
+
     if not does_draw and not should_print:
         pool = mp.Pool(processes=mp.cpu_count())
-        map_result = pool.map_async(run_one_game, [(does_draw, should_print, Random_Actor, Expert_Actor, i) for i in range(num_games)])
+        map_result = pool.map_async(run_one_game, [(does_draw, should_print, actor1, actor2, i) for i in range(num_games)])
         result_log = map_result.get()
         pool.close()
     else:
@@ -65,7 +74,7 @@ if __name__ == "__main__":
         # does_draw = False
         # should_print = False
         for i in range(num_games):
-            result_log.append(run_one_game((does_draw, should_print, Expert_Actor, Expert_Actor, i)))
+            result_log.append(run_one_game((does_draw, should_print, actor1, actor2, i)))
 
     for num_turns, p1_dmg, p2_dmg in result_log:
         p1_total_dmg += p1_dmg

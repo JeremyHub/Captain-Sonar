@@ -56,3 +56,23 @@ class Observation:
             self.phase_num,
             self.opp_quadrant
         ] + self.opp_actions.get_obs_arr() + self.breakdowns + self.power_marks
+
+
+    def make_obs_from_arr(self, arr):
+        # assert len(arr) == 12 + NUM_BREAKDOWNS + len(Power)
+        self.your_dmg = arr[0]
+        self.opp_dmg = arr[1]
+        self.row = arr[2]
+        self.col = arr[3]
+        self.phase_num = arr[4]
+        self.opp_quadrant = arr[5]
+        self.opp_actions = Public_Actions()
+        self.opp_actions.direction_moved = arr[6]
+        self.opp_actions.torpedo_used = arr[7]
+        self.opp_actions.torpedo_row = arr[8]
+        self.opp_actions.torpedo_col = arr[9]
+        self.opp_actions.silence_used = arr[10]
+        self.opp_actions.surface_quadrant = arr[11]
+        self.opp_actions.drone_used = arr[12]
+        self.breakdowns = arr[13:13+NUM_BREAKDOWNS]
+        self.power_marks = arr[13+NUM_BREAKDOWNS:]
