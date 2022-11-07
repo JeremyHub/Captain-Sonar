@@ -22,11 +22,11 @@ class Human_Actor(Actor):
         reccomened_action = self.expert_actor.choose_action(actions, obs_arr)
         print("Reccomended action: " + str(self.reverse_action_dict[reccomened_action]))
         # if its mov phase
-        if obs_arr[4] == 4 and len(actions) > 1:
-            for i, action in enumerate(actions):
-                print(i, self.reverse_action_dict[action])
-        # ask for which action to take
-            action = int(input("which action? "))
-            return actions[action]
-        else:
-            return reccomened_action
+        # if obs_arr[4] == 4 and len(actions) > 1:
+        for i, action in enumerate(actions):
+            print(i, self.reverse_action_dict[action])
+    # ask for which action to take
+        action = int(input("which action? "))
+        return actions[action]
+        # else:
+        #     return reccomened_action

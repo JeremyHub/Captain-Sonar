@@ -1,4 +1,5 @@
 from game.game import CaptainSonar, Phase
+from game.game_only_move_steps import Game_Only_Move_Steps
 from game.observation import Observation, Public_Actions
 from actors.random_actor import Random_Actor
 from actors.expert_actor import Expert_Actor
@@ -8,6 +9,7 @@ import multiprocessing as mp
 
 def run_one_game(tuple_of_args):
     does_draw, should_print, actor1, actor2, game_num = tuple_of_args
+    # g = Game_Only_Move_Steps(does_draw)
     g = CaptainSonar(does_draw)
     obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
     p1 = actor1(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)

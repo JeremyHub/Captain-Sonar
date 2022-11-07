@@ -1,7 +1,5 @@
 from actors.expert_actor import Expert_Actor
 from game.game import CaptainSonar
-from game.observation import Observation
-from game.observation import Public_Actions
 
 
 class Game_Only_Move_Steps(CaptainSonar):
@@ -10,7 +8,6 @@ class Game_Only_Move_Steps(CaptainSonar):
         self.reset()
 
     def step(self, action):
-        # observation = super()._update_observation(Observation(Public_Actions())).get_obs_arr()
         observation, reward1, done = super().step(action)
         while not observation[4] in [4,1] and not done:
             if self.to_play() == 1:
