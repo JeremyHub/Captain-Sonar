@@ -35,7 +35,7 @@ class Observation:
     """
     opp_actions: Public_Actions = None
     breakdowns: list = None
-    power_marks: dict[Power, int] = None
+    power_marks: dict = None
     your_dmg: int = -1
     opp_dmg: int = -1
     row: int = -1

@@ -5,17 +5,17 @@ from .observation import Public_Actions
 
 
 class Sub:
-    loc: tuple[int, int]
-    path: list[tuple[int, int]]
+    loc: tuple
+    path: list
     breakdownMap: BreakdownMap
-    powers: dict[Power, int]
+    powers: dict
     player: Player
     remaining_surface_turns: int
-    board: list[list[int]]
+    board: list
     last_actions: Public_Actions
 
 
-    def __init__(self, player: Player, board: list[list[int]]):
+    def __init__(self, player: Player, board: list):
         self.player = player
         self.board = board
         self.loc = (-1,-1)
@@ -28,7 +28,7 @@ class Sub:
         self.silences_on_path = []
 
     
-    def set_starting_loc(self, loc: tuple[int, int]):
+    def set_starting_loc(self, loc: tuple):
         assert self.path == [], "setting starting loc of existing sub"
         self.loc = loc
 

@@ -33,13 +33,13 @@ class CaptainSonar:
     player: Sub
     phase: Phase
     phase_num: int
-    board: tuple[tuple[int]]
+    board: tuple
     declared_direction: Direction
     power_to_aim: Power
     does_draw: bool
     screen: Any # pg.surface
-    ACTION_DICT = dict[Any, int]
-    REVERSE_ACTION_DICT = dict[Any, int]
+    ACTION_DICT = dict
+    REVERSE_ACTION_DICT = dict
     
 
     def __init__(self, does_draw = False):
@@ -314,7 +314,7 @@ class CaptainSonar:
             for loc1, loc2 in player.silences_on_path:
                 self.pg.draw.line(self.screen, color, self._get_coord_center_on_board(loc1, offset), self._get_coord_center_on_board(loc2, offset), self.SCREEN_HEIGHT//200)
     
-    def pg_draw_points(self, points: list[tuple[int, int]], color: tuple[int, int, int], offset: float):
+    def pg_draw_points(self, points: list, color: tuple, offset: float):
         for row, col in points:
             rec = self.pg.Rect(self._get_x_on_board(col)+offset, self._get_y_on_board(row)+offset, self.SCREEN_WIDTH/160, self.SCREEN_HEIGHT/80)
             self.pg.draw.rect(self.screen, color, rec)
