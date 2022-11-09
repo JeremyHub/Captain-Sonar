@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from game.breakdowns import BreakdownMap
-from game.constants import Power
+from .breakdowns import BreakdownMap
+from .constants import Power
 
 
 NUM_BREAKDOWNS = len(BreakdownMap().all_breakdowns)

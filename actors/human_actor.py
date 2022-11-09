@@ -1,8 +1,8 @@
 from typing import Any
 
-from actors.actor import Actor
-from actors.expert_actor import Expert_Actor
-from game.observation import Observation
+from .actor import Actor
+from .expert_actor import Expert_Actor
+from ..game.observation import Observation
 
 class Human_Actor(Actor):
     

@@ -1,9 +1,9 @@
 from enum import Enum
 from typing import Any
-from game.action_dict import make_action_dict
-from game.observation import Observation, Public_Actions
-from game.sub import Sub
-from game.constants import Player, Direction, ALPHA_BOARD, Power
+from .action_dict import make_action_dict
+from .observation import Observation, Public_Actions
+from .sub import Sub
+from .constants import Player, Direction, ALPHA_BOARD, Power
 
 
 class Phase(Enum):

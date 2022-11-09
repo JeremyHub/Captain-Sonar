@@ -1,9 +1,9 @@
-from game.game import CaptainSonar, Phase
-from game.game_only_move_steps import Game_Only_Move_Steps
-from game.observation import Observation, Public_Actions
-from actors.random_actor import Random_Actor
-from actors.expert_actor import Expert_Actor
-from actors.human_actor import Human_Actor
+from .game.game import CaptainSonar, Phase
+from .game.game_only_move_steps import Game_Only_Move_Steps
+from .game.observation import Observation, Public_Actions
+from .actors.random_actor import Random_Actor
+from .actors.expert_actor import Expert_Actor
+from .actors.human_actor import Human_Actor
 import multiprocessing as mp
 
 

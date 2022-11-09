@@ -1,5 +1,5 @@
-from game.breakdowns import BreakdownMap
-from game.constants import Direction, Power
+from .breakdowns import BreakdownMap
+from .constants import Direction, Power
 
 def make_action_dict(board_x, board_y):
     # none is surfacing for movement phase and doing nothing for power mark/activate phase

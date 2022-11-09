@@ -1,4 +1,4 @@
-from game.game import CaptainSonar
+from .game.game import CaptainSonar
 
 class MuZeroConfig:
     def __init__(self):

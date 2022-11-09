@@ -1,7 +1,7 @@
 from random import randint
 from typing import Any
 
-from actors.actor import Actor
+from .actor import Actor
 
 class Random_Actor(Actor):
     

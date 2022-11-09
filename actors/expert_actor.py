@@ -1,10 +1,10 @@
 from random import randint
 from typing import Any
 
-from game.breakdowns import BreakdownChannel, BreakdownMap, BreakdownType
-from actors.actor import Actor
-from game.constants import DIRECTION_COORDS, Direction, Power
-from game.sub import Sub
+from ..game.breakdowns import BreakdownChannel, BreakdownMap, BreakdownType
+from .actor import Actor
+from ..game.constants import DIRECTION_COORDS, Direction, Power
+from ..game.sub import Sub
 
 
 class Expert_Actor(Actor):

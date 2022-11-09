@@ -1,5 +1,5 @@
-from actors.expert_actor import Expert_Actor
-from game.game import CaptainSonar
+from ..actors.expert_actor import Expert_Actor
+from .game import CaptainSonar
 
 
 class Game_Only_Move_Steps(CaptainSonar):

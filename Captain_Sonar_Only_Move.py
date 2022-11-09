@@ -1,4 +1,4 @@
-from game.game_only_move_steps import CaptainSonarMoveGame
+from .game.game_only_move_steps import CaptainSonarMoveGame
 
 class MuZeroConfig:
     def __init__(self):
