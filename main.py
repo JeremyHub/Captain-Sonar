@@ -8,9 +8,8 @@ import multiprocessing as mp
 
 
 def run_one_game(tuple_of_args):
-    does_draw, should_print, actor1, actor2, game_num = tuple_of_args
-    # g = Game_Only_Move_Steps(does_draw)
-    g = CaptainSonar(does_draw)
+    does_draw, should_print, actor1, actor2, game_num, game_type = tuple_of_args
+    g = game_type(does_draw)
     obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
     p1 = actor1(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     p2 = actor2(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
@@ -44,11 +43,14 @@ def run_one_game(tuple_of_args):
     return num_turns, g.p1.damage, g.p2.damage
 
 if __name__ == "__main__":
-    human_playing = True
-    # does_draw = False
-    does_draw = True
+    human_playing = False
+    # human_playing = True
+    does_draw = False
+    # does_draw = True
     should_print = False
     # should_print = True
+
+    dont_mp = False
 
     num_games = 10000
     num_actual_games = 0
@@ -58,6 +60,9 @@ if __name__ == "__main__":
     p1_wins = 0
     p2_wins = 0
 
+    game_type = Game_Only_Move_Steps
+    # game_type = CaptainSonar
+
     if human_playing:
         actor1 = Human_Actor
         actor2 = Expert_Actor
@@ -65,9 +70,9 @@ if __name__ == "__main__":
         actor1 = Random_Actor
         actor2 = Expert_Actor
 
-    if not does_draw and not should_print:
+    if not does_draw and not should_print and not human_playing and not dont_mp:
         pool = mp.Pool(processes=mp.cpu_count())
-        map_result = pool.map_async(run_one_game, [(does_draw, should_print, actor1, actor2, i) for i in range(num_games)])
+        map_result = pool.map_async(run_one_game, [(does_draw, should_print, actor1, actor2, i, game_type) for i in range(num_games)])
         result_log = map_result.get()
         pool.close()
     else:
@@ -76,7 +81,7 @@ if __name__ == "__main__":
         # does_draw = False
         # should_print = False
         for i in range(num_games):
-            result_log.append(run_one_game((does_draw, should_print, actor1, actor2, i)))
+            result_log.append(run_one_game((does_draw, should_print, actor1, actor2, i, game_type)))
 
     for num_turns, p1_dmg, p2_dmg in result_log:
         p1_total_dmg += p1_dmg
