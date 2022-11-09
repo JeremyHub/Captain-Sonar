@@ -1,6 +1,6 @@
 from game.game import CaptainSonar
 
-class CaptainSonar(AbstractGame):
+class CaptainSonarGame(AbstractGame):
     """
     Game wrapper.
     """

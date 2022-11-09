@@ -1,12 +1,12 @@
-from game.game import CaptainSonar
+from game.game_only_move_steps import CaptainSonarMoveGame
 
-class CaptainSonar(AbstractGame):
+class CaptainSonarMoveGame(AbstractGame):
     """
     Game wrapper.
     """
 
     def __init__(self, seed=None):
-        self.env = CaptainSonar(seed)
+        self.env = CaptainSonarMoveGame(seed)
 
     def step(self, action):
         """
