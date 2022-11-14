@@ -19,9 +19,9 @@ def run_one_game(tuple_of_args):
         if should_print: print("---------------------------------------")
         if should_print: print("player: ", g.player.player)
         options = g.legal_actions()
-        if g.to_play() == 1:
+        if g.to_play() == 0:
             action = p1.choose_action(options, obs)
-        elif g.to_play() == 2:
+        elif g.to_play() == 1:
             action = p2.choose_action(options, obs)
         if should_print: print("phase: ", g.phase)
         if should_print: print("options: ", options)
@@ -50,9 +50,9 @@ if __name__ == "__main__":
     should_print = False
     # should_print = True
 
-    dont_mp = True
+    dont_mp = False
 
-    num_games = 10000
+    num_games = 1000
     num_actual_games = 0
     all_num_turns = []
     p1_total_dmg = 1

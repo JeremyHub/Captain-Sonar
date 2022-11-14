@@ -4,7 +4,6 @@ from .action_dict import make_action_dict
 from .observation import Observation, Public_Actions
 from .sub import Sub
 from .constants import Player, Direction, ALPHA_BOARD, Power
-import numpy
 
 
 class Phase(Enum):

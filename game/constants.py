@@ -20,8 +20,8 @@ class Power(Enum):
     Torpedo = 3
 
 class Player(Enum):
-    One = 1
-    Two = 2
+    One = 0
+    Two = 1
 
 POWER_COSTS = {
     Power.Torpedo: 3,
