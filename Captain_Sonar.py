@@ -2,6 +2,8 @@ from .game.game import CaptainSonar
 from .abstract_game import AbstractGame
 from .muzero_config import MuZeroConfig
 
+MuZeroConfig.results_path = pathlib.Path(os.path.join(os.path.dirname(os.path.realpath(__file__)), "../results", os.path.basename(__file__)[:-3], datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S")))  # Path to store the model weights and TensorBoard logs
+
 class Game(AbstractGame):
     """
     Game wrapper.
