@@ -50,7 +50,8 @@ if __name__ == "__main__":
     should_print = False
     # should_print = True
 
-    dont_mp = False
+    dont_mp = True
+    # dont_mp = False
 
     num_games = 1000
     num_actual_games = 0
@@ -78,8 +79,6 @@ if __name__ == "__main__":
     else:
         pg = __import__("pygame")
         result_log = []
-        # does_draw = False
-        # should_print = False
         for i in range(num_games):
             result_log.append(run_one_game((does_draw, should_print, actor1, actor2, i, game_type)))
 
