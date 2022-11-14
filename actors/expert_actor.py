@@ -9,7 +9,7 @@ from ..game.sub import Sub
 
 class Expert_Actor(Actor):
     
-    def __init__(self, action_dict: dict[Any, int], reverse_action_dict: dict[int, Any], board: tuple[tuple[int]]):
+    def __init__(self, action_dict: dict, reverse_action_dict: dict, board: tuple):
         super().__init__(action_dict, reverse_action_dict, board)
         self.breakdowns = BreakdownMap()
         self.examined_obs = set()
@@ -18,14 +18,14 @@ class Expert_Actor(Actor):
         self.used_torpedo_loc = None
         self.prev_opp_dmg = None
 
-        self.possible_opp_positions: set[tuple[int, int]] = set()
+        self.possible_opp_positions: set = set()
         for row in range(len(self.board)):
             for col in range(len(self.board[row])):
                 if self.board[row][col] == 0:
                     self.possible_opp_positions.add((row, col))
 
 
-    def _choose_action(self, actions: list[int], obs: list[int]):
+    def _choose_action(self, actions: list, obs: list):
 
         if self.unexamined_first_phase_obs:
             self.used_torpedo = False
