@@ -10,7 +10,7 @@ import multiprocessing as mp
 def run_one_game(tuple_of_args):
     does_draw, should_print, actor1, actor2, game_num, game_type = tuple_of_args
     g = game_type(does_draw)
-    obs = g._update_observation(Observation(Public_Actions())).get_obs_arr()
+    obs = g.reset()
     p1 = actor1(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     p2 = actor2(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
     done = False

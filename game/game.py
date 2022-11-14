@@ -71,6 +71,7 @@ class CaptainSonar:
         self.power_to_aim = None
         if self.does_draw:
             self.draw_all_boards()
+        return self._update_observation(Observation(Public_Actions())).get_obs_arr()
 
 
     def draw_all_boards(self):
@@ -184,7 +185,7 @@ class CaptainSonar:
             obs.breakdowns.append(int(breakdown.marked))
             
         return obs
-
+    
     
     def legal_actions(self):
         actions = None

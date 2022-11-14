@@ -1,5 +1,5 @@
 import pathlib
-from .game.game_only_move_steps import CaptainSonarMoveGame
+from .game.game_only_move_steps import Game_Only_Move_Steps
 import datetime
 import os
 import numpy
@@ -131,7 +131,7 @@ class Game(AbstractGame):
     """
 
     def __init__(self, seed=None):
-        self.env = CaptainSonarMoveGame()
+        self.env = Game_Only_Move_Steps()
 
     def step(self, action):
         """
