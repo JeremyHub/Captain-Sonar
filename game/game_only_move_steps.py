@@ -9,7 +9,7 @@ class Game_Only_Move_Steps(CaptainSonar):
 
     def step(self, action):
         observation, reward1, done = super().step(action)
-        while not observation[4] in [4,1] and not done:
+        while not observation[0][0][4] in [4,1] and not done:
             reccomendation = self.actor.choose_action(self.legal_actions(), observation)
             observation, reward, done = super().step(reccomendation)
         observation.extend((self.actor.average_enemy_loc[0], self.actor.average_enemy_loc[1]))

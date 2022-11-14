@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 from .breakdowns import BreakdownMap
 from .constants import Power
+import numpy
 
 
 NUM_BREAKDOWNS = len(BreakdownMap().all_breakdowns)
@@ -48,14 +49,14 @@ class Observation:
         assert self.opp_actions is not None
         assert len(self.breakdowns) == NUM_BREAKDOWNS
         assert len(self.power_marks) == len(Power)
-        return [
+        return numpy.array([[[
             self.your_dmg,
             self.opp_dmg,
             self.row,
             self.col,
             self.phase_num,
             self.opp_quadrant
-        ] + self.opp_actions.get_obs_arr() + self.breakdowns + self.power_marks
+        ] + self.opp_actions.get_obs_arr() + self.breakdowns + self.power_marks]])
 
 
     def make_obs_from_arr(self, arr):

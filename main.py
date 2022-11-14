@@ -50,7 +50,7 @@ if __name__ == "__main__":
     should_print = False
     # should_print = True
 
-    dont_mp = False
+    dont_mp = True
 
     num_games = 10000
     num_actual_games = 0

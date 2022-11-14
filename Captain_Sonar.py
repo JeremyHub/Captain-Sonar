@@ -2,6 +2,7 @@ import pathlib
 from .game.game import CaptainSonar
 import datetime
 import os
+import numpy
 
 import numpy
 import torch
@@ -130,7 +131,7 @@ class Game(AbstractGame):
     """
 
     def __init__(self, seed=None):
-        self.env = CaptainSonar(seed)
+        self.env = CaptainSonar()
 
     def step(self, action):
         """
@@ -141,7 +142,7 @@ class Game(AbstractGame):
             The new observation, the reward and a boolean if the game has ended.
         """
         observation, reward, done = self.env.step(action)
-        return numpy.array([[observation]]), reward, done
+        return observation, reward, done
 
     def to_play(self):
         """
