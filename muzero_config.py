@@ -1,8 +1,8 @@
 import datetime
 import os
+import pathlib
 import numpy
 import torch
-import pathlib
 
 class MuZeroConfig:
     def __init__(self):
