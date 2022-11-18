@@ -45,8 +45,8 @@ def run_one_game(tuple_of_args):
 if __name__ == "__main__":
     human_playing = False
     # human_playing = True
-    does_draw = False
-    # does_draw = True
+    # does_draw = False
+    does_draw = True
     should_print = False
     # should_print = True
 

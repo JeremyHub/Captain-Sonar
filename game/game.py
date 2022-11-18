@@ -75,9 +75,9 @@ class CaptainSonar:
 
     def draw_all_boards(self):
         self.screen.fill((0,0,0))
-        self.setup_boards("res/powers.png", BoardNumDisplay.Powers)
-        self.setup_boards("res/breakdowns.png", BoardNumDisplay.Breakdowns)
-        self.setup_map("res/alpha_map.png")
+        self.setup_boards("Captain-Sonar/res/powers.png", BoardNumDisplay.Powers)
+        self.setup_boards("Captain-Sonar/res/breakdowns.png", BoardNumDisplay.Breakdowns)
+        self.setup_map("Captain-Sonar/res/alpha_map.png")
 
 
     def setup_map(self, path):
