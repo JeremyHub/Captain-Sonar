@@ -43,7 +43,7 @@ class BreakdownDot:
 class BreakdownMap:
     def __init__(self):
         self.all_breakdowns = [
-            # this list in order of appearence from left to right on the board (important for drawing)
+            # this list in order of appearence from left to right on the board in terms of directions (important for drawing)
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Red, Direction.West),
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Yellow, Direction.West),
             BreakdownDot(BreakdownChannel.Yellow, BreakdownType.Green, Direction.West),
