@@ -48,15 +48,27 @@ class CaptainSonar:
         self.ACTION_DICT = make_action_dict(len(self.board), len(self.board[0]))
         self.REVERSE_ACTION_DICT = {v: k for k, v in self.ACTION_DICT.items()}
         if self.does_draw:
-            self.pg = __import__("pygame")
-            self.pg.init()
-            self.screen = self.pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
+            self._setup_pg()
         self.reset()
+
+
+    def render(self):
+        if not self.does_draw:
+            self.does_draw = True
+            self._setup_pg()
+        self.update_display()
 
 
     @property
     def opponent(self):
         return self.p2 if self.player == self.p1 else self.p1
+
+
+    def _setup_pg(self):
+        assert self.does_draw
+        self.pg = __import__("pygame")
+        self.pg.init()
+        self.screen = self.pg.display.set_mode((self.SCREEN_WIDTH, self.SCREEN_HEIGHT))
 
 
     def reset(self):
