@@ -19,14 +19,22 @@ class Human_Actor(Actor):
         print(obs.__dict__)
         # print actions with names in rev action dict
         print("actions:")
-        reccomened_action = self.expert_actor.choose_action(actions, obs_arr)
+        reccomened_action = self.expert_actor.choose_action(actions, [[obs_arr]])
         print("Reccomended action: " + str(self.reverse_action_dict[reccomened_action]))
         # if its mov phase
         # if obs_arr[4] == 4 and len(actions) > 1:
         for i, action in enumerate(actions):
             print(i, self.reverse_action_dict[action])
     # ask for which action to take
-        action = int(input("which action? "))
+        while True:
+            try:
+                action = int(input("Which action do you want to take? "))
+                if action in range(len(actions)):
+                    break
+                else:
+                    print("That action is not in the list of actions")
+            except ValueError:
+                print("That is not a number")
         return actions[action]
         # else:
         #     return reccomened_action
