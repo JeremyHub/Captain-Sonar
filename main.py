@@ -43,15 +43,15 @@ def run_one_game(tuple_of_args):
     return num_turns, g.p1.damage, g.p2.damage
 
 if __name__ == "__main__":
-    # human_playing = False
-    human_playing = True
+    human_playing = False
+    # human_playing = True
     does_draw = False
     # does_draw = True
     should_print = False
     # should_print = True
 
-    dont_mp = True
-    # dont_mp = False
+    # dont_mp = True
+    dont_mp = False
 
     num_games = 1000
     num_actual_games = 0
@@ -61,8 +61,8 @@ if __name__ == "__main__":
     p1_wins = 0
     p2_wins = 0
 
-    game_type = Game_Only_Move_Steps
-    # game_type = CaptainSonar
+    # game_type = Game_Only_Move_Steps
+    game_type = CaptainSonar
 
     if human_playing:
         actor1 = Human_Actor
