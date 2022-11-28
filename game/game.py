@@ -27,7 +27,7 @@ class CaptainSonar:
     SCREEN_WIDTH = 1500
     BOARD_FRAC_OF_DISPLAY = 4
     p1: Sub
-    P1_COLOR = (0,0,0)
+    P1_COLOR = (0,0,255)
     p2: Sub
     P2_COLOR = (255,0,0)
     player: Sub
@@ -162,6 +162,10 @@ class CaptainSonar:
         else:
             raise Exception("phase not found")
         reward = self.opponent.damage - self.player.damage
+        if self.opponent.damage >= 4 and self.player.damage < 4:
+            reward += 100
+        elif self.player.damage >= 4 and self.opponent.damage < 4:
+            reward -= 100
         done = self.player.damage >= 4 or self.opponent.damage >= 4
         if done and self.does_draw:
             if self.player.damage >= 4:
@@ -311,7 +315,7 @@ class CaptainSonar:
     def _pg_update_player_pos_and_path(self):
         x = self._get_x_on_board
         y = self._get_y_on_board
-        l = [(self.p1, self.P1_COLOR, 0), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT*0.008)]
+        l = [(self.p1, self.P1_COLOR, -self.SCREEN_HEIGHT*0.004), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT*0.004)]
         for player, color, offset in l:
             if player.loc:
                 rec = self.pg.Rect(x(player.loc[1])+offset, y(player.loc[0])+offset, self.SCREEN_WIDTH/80, self.SCREEN_HEIGHT/40)
