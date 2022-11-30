@@ -96,8 +96,8 @@ class Expert_Actor(Actor):
                 elif val == most_unmarked:
                     best_dirs.append(key)
             # if we will take damage, surface instead
-            if most_unmarked in [1,-1]:
-                return actions[0]
+            # if most_unmarked in [1,-1]:
+            #     return actions[0]
             
             best_dirs_in_direction = []
             for dir in best_dirs:

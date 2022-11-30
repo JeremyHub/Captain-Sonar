@@ -45,15 +45,15 @@ def run_one_game(tuple_of_args):
 if __name__ == "__main__":
     human_playing = False
     # human_playing = True
-    # does_draw = False
-    does_draw = True
+    does_draw = False
+    # does_draw = True
     should_print = False
     # should_print = True
 
-    dont_mp = True
-    # dont_mp = False
+    # dont_mp = True
+    dont_mp = False
 
-    num_games = 1000
+    num_games = 10000
     num_actual_games = 0
     all_num_turns = []
     p1_total_dmg = 1

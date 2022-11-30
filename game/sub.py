@@ -100,14 +100,16 @@ class Sub:
 
 
     def get_valid_directions(self):
-        valid_directions = [None]
+        valid_directions = []
         if self.remaining_surface_turns:
-            return valid_directions
+            return [None]
         for direction in Direction:
             row,col = self.get_coord_in_direction(self.loc, direction)
             if self.in_bounds(row, col, self.board):
                 if self.board[row][col] == 0 and (row,col) not in self.path:
                     valid_directions.append(direction)
+        if not valid_directions:
+            valid_directions.append(None)
         return valid_directions
 
     
