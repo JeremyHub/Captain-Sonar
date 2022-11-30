@@ -54,8 +54,10 @@ class Game(AbstractGame):
         """
         Display the game observation.
         """
-        self.env.render()
-        input("Press enter to take a step ")
+        # self.env.render()
+        # input("Press enter to take a step ")
+        # TODO render with text
+        pass
 
     def human_to_action(self):
         """
