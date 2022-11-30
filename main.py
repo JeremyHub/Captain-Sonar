@@ -12,7 +12,9 @@ def run_one_game(tuple_of_args):
     g = game_type(does_draw)
     obs = g.reset()
     p1 = actor1(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
+    p1_rewards = []
     p2 = actor2(g.ACTION_DICT, g.REVERSE_ACTION_DICT, g.board)
+    p2_rewards = []
     done = False
     num_turns = 0
     while not done:
@@ -27,6 +29,10 @@ def run_one_game(tuple_of_args):
         if should_print: print("options: ", options)
         if should_print: print("action: ", g.REVERSE_ACTION_DICT[action])
         obs, reward, done = g.step(action)
+        if g.to_play() == 0:
+            p1_rewards.append(reward)
+        elif g.to_play() == 1:
+            p2_rewards.append(reward)
         if g.phase == Phase.Movement:
             num_turns += 1
         if does_draw:
@@ -40,13 +46,13 @@ def run_one_game(tuple_of_args):
         if should_print: print("done: ", done)
     if game_num % 100 == 0:
         print(f"game {game_num} done")
-    return num_turns, g.p1.damage, g.p2.damage
+    return num_turns, g.p1.damage, g.p2.damage, p1_rewards, p2_rewards
 
 if __name__ == "__main__":
     human_playing = False
     # human_playing = True
-    # does_draw = False
-    does_draw = True
+    does_draw = False
+    # does_draw = True
     should_print = False
     # should_print = True
 
@@ -82,7 +88,12 @@ if __name__ == "__main__":
         for i in range(num_games):
             result_log.append(run_one_game((does_draw, should_print, actor1, actor2, i, game_type)))
 
-    for num_turns, p1_dmg, p2_dmg in result_log:
+    p1_rewards = []
+    p2_rewards = []
+
+    for num_turns, p1_dmg, p2_dmg, p1_rewards_one_game, p2_rewards_one_game in result_log:
+        p1_rewards.append(sum(p1_rewards_one_game))
+        p2_rewards.append(sum(p2_rewards_one_game))
         p1_total_dmg += p1_dmg
         p2_total_dmg += p2_dmg
         all_num_turns.append(num_turns)
@@ -105,4 +116,6 @@ if __name__ == "__main__":
     print("p2 wins: ", p2_wins)
     print("p1 win ratio: ", p1_wins/num_actual_games)
     print("p2 win ratio: ", p2_wins/num_actual_games)
+    print("p1 avg reward: ", sum(p1_rewards)/len(p1_rewards))
+    print("p2 avg reward: ", sum(p2_rewards)/len(p2_rewards))
     if does_draw: pg.quit()
