@@ -80,6 +80,7 @@ class CaptainSonar:
         self.phase_num = None
         self.declared_direction = None
         self.power_to_aim = None
+        self.observation = self._update_observation(Observation())
         if self.does_draw:
             self.draw_all_boards()
         return self._update_observation(Observation(Public_Actions())).get_obs_arr()
@@ -183,6 +184,7 @@ class CaptainSonar:
                     self.pg.quit()
                     raise KeyboardInterrupt()
             self.update_display()
+        self.observation = observation.get_obs_arr()
         return observation.get_obs_arr(), reward, done
 
     

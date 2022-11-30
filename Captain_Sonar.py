@@ -1,11 +1,7 @@
+from .actors.expert_actor import Expert_Actor
 from .game.game import CaptainSonar
 from .abstract_game import AbstractGame
 from .muzero_config import MuZeroConfig
-import datetime
-import os
-import pathlib
-
-MuZeroConfig.results_path = pathlib.Path(os.path.join(os.path.dirname('/content/drive/My Drive'), "../results", os.path.basename(__file__)[:-3], datetime.datetime.now().strftime("%Y-%m-%d--%H-%M-%S")))  # Path to store the model weights and TensorBoard logs
 
 class Game(AbstractGame):
     """
@@ -51,6 +47,7 @@ class Game(AbstractGame):
         Returns:
             Initial observation of the game.
         """
+        self.expert = None
         return self.env.reset()
 
     def render(self):
@@ -91,4 +88,6 @@ class Game(AbstractGame):
         Returns:
             Action as an integer to take in the current game state
         """
-        return self.env.random_action()
+        if self.expert == None:
+            self.expert = Expert_Actor(self.env.ACTION_DICT, self.env.REVERSE_ACTION_DICT, self.env.board)
+        return self.expert.choose_action(self.legal_actions(), self.env.observation)
