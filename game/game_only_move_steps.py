@@ -14,6 +14,7 @@ class Game_Only_Move_Steps(CaptainSonar):
             observation, reward, done = super().step(reccomendation)
         observation[0][0][4] = self.actor.average_enemy_loc[0]
         observation[0][0][5] = self.actor.average_enemy_loc[1]
+        self.observation = observation
         return observation, reward1, done
 
     def reset(self):

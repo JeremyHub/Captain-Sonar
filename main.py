@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # dont_mp = True
     dont_mp = False
 
-    num_games = 10000
+    num_games = 1000
     num_actual_games = 0
     all_num_turns = []
     p1_total_dmg = 1
@@ -67,8 +67,8 @@ if __name__ == "__main__":
     p1_wins = 0
     p2_wins = 0
 
-    # game_type = Game_Only_Move_Steps
-    game_type = CaptainSonar
+    game_type = Game_Only_Move_Steps
+    # game_type = CaptainSonar
 
     if human_playing:
         actor1 = Human_Actor

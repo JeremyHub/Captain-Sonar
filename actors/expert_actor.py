@@ -25,14 +25,15 @@ class Expert_Actor(Actor):
                     self.possible_opp_positions.add((row, col))
 
 
-    def _choose_action(self, actions: list, obs: list):
+    def _choose_action(self, actions: list, obs: list, should_update: bool = True):
 
         if self.unexamined_first_phase_obs:
             self.used_torpedo = False
             self.used_torpedo_loc = None
             self.prev_opp_dmg = obs[1]
 
-        self._update_possible_enemy_locs(obs)
+        if should_update:
+            self._update_possible_enemy_locs(obs)
 
         # if its choose power phase
         if obs[4] == 2:
