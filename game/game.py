@@ -80,7 +80,7 @@ class CaptainSonar:
         self.phase_num = None
         self.declared_direction = None
         self.power_to_aim = None
-        self.observation = self._update_observation(Observation())
+        self.observation = self._update_observation(Observation()).get_obs_arr()
         if self.does_draw:
             self.draw_all_boards()
         return self._update_observation(Observation(Public_Actions())).get_obs_arr()
