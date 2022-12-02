@@ -23,15 +23,17 @@ def run_one_game(tuple_of_args):
         options = g.legal_actions()
         if g.to_play() == 0:
             action = p1.choose_action(options, obs)
+            was_p1 = True
         elif g.to_play() == 1:
+            was_p1 = False
             action = p2.choose_action(options, obs)
         if should_print: print("phase: ", g.phase)
         if should_print: print("options: ", options)
         if should_print: print("action: ", g.REVERSE_ACTION_DICT[action])
         obs, reward, done = g.step(action)
-        if g.to_play() == 0:
+        if was_p1:
             p1_rewards.append(reward)
-        elif g.to_play() == 1:
+        else:
             p2_rewards.append(reward)
         if g.phase == Phase.Movement:
             num_turns += 1
@@ -48,7 +50,7 @@ def run_one_game(tuple_of_args):
         print(f"game {game_num} done")
     return num_turns, g.p1.damage, g.p2.damage, p1_rewards, p2_rewards
 
-if __name__ == "__main__":
+def main():
     human_playing = False
     # human_playing = True
     does_draw = False
@@ -59,7 +61,7 @@ if __name__ == "__main__":
     # dont_mp = True
     dont_mp = False
 
-    num_games = 1000
+    num_games = 10000
     num_actual_games = 0
     all_num_turns = []
     p1_total_dmg = 1
@@ -67,8 +69,8 @@ if __name__ == "__main__":
     p1_wins = 0
     p2_wins = 0
 
-    game_type = Game_Only_Move_Steps
-    # game_type = CaptainSonar
+    # game_type = Game_Only_Move_Steps
+    game_type = CaptainSonar
 
     if human_playing:
         actor1 = Human_Actor
@@ -119,3 +121,38 @@ if __name__ == "__main__":
     print("p1 avg reward: ", sum(p1_rewards)/len(p1_rewards))
     print("p2 avg reward: ", sum(p2_rewards)/len(p2_rewards))
     if does_draw: pg.quit()
+
+def test_only_moves_game():
+    from .Captain_Sonar_Only_Move import Game
+    game = Game()
+    p1_rewards = []
+    p2_rewards = []
+    p1_actor = Random_Actor(game.env.ACTION_DICT, game.env.REVERSE_ACTION_DICT, game.env.board)
+    game.reset()
+    for _ in range(1000):
+        game.reset()
+        done = False
+        while not done:
+            if game.env.to_play() == 0:
+                options = game.legal_actions()
+                action = p1_actor.choose_action(options, game.env.observation)
+                was_p1 = True
+            else:
+                was_p1 = False
+                action = game.expert_agent()
+            obs, reward, done = game.step(action)
+            if was_p1:
+                p1_rewards.append(reward)
+            else:
+                p2_rewards.append(reward)
+    print("p1 rewards: ", sum(p1_rewards)/len(p1_rewards))
+    print("p1 total rewards: ", sum(p1_rewards))
+    print("len p1 rewards: ", len(p1_rewards))
+    print("p2 rewards: ", sum(p2_rewards)/len(p2_rewards))
+    print("p2 total rewards: ", sum(p2_rewards))
+    print("len p2 rewards: ", len(p2_rewards))
+
+
+if __name__ == "__main__":
+    main()
+    # test_only_moves_game()

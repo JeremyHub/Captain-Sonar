@@ -18,10 +18,10 @@ class Game_Only_Move_Steps(CaptainSonar):
         return observation, reward1, done
 
     def reset(self):
-        obs = super().reset()
+        self.observation = super().reset()
         self.a1 = Expert_Actor(self.ACTION_DICT, self.REVERSE_ACTION_DICT, self.board)
         self.a2 = Expert_Actor(self.ACTION_DICT, self.REVERSE_ACTION_DICT, self.board)
-        return obs
+        return self.observation
 
     @property
     def actor(self):

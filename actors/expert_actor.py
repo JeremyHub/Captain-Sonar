@@ -35,6 +35,9 @@ class Expert_Actor(Actor):
         if should_update:
             self._update_possible_enemy_locs(obs)
 
+        avg_point = self._get_average_point(self.possible_opp_positions)
+        self.average_enemy_loc = avg_point
+
         # if its choose power phase
         if obs[4] == 2:
             if self.action_dict[Power.Torpedo] in actions:
@@ -74,8 +77,6 @@ class Expert_Actor(Actor):
             # use that confidence as a weight for how much to weigh decideing to go in that direction
             # take that score in conjunction with the breakdowns to decide which direction to go
 
-            avg_point = self._get_average_point(self.possible_opp_positions)
-            self.average_enemy_loc = avg_point
             vector_to_avg_enemy_pos = ((obs[2] - avg_point[0]), (obs[3] - avg_point[1]))
             vector_to_avg_enemy_pos = (round(vector_to_avg_enemy_pos[0]/abs(vector_to_avg_enemy_pos[0]+0.001)),round(vector_to_avg_enemy_pos[1]/abs(vector_to_avg_enemy_pos[1]+0.001)))
 
