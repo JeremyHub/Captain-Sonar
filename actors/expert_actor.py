@@ -139,7 +139,7 @@ class Expert_Actor(Actor):
 
         # if we get to here just do something random
         # if its mov or power phase dont do nothing
-        if len(actions) > 1 and obs[4] in [4, 2]:
+        if len(actions) > 1 and obs[4] in [2]:
             action = randint(1,len(actions)-1)
         else:
             action = randint(0,len(actions)-1)
