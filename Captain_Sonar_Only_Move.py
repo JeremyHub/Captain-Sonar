@@ -1,7 +1,7 @@
 from .actors.expert_actor import Expert_Actor
 from .game.game_only_move_steps import Game_Only_Move_Steps
 from .Captain_Sonar import Game
-# from .muzero_config import MuZeroConfig
+from .muzero_config import MuZeroConfig
 
 class Game(Game):
 

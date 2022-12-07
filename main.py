@@ -37,12 +37,12 @@ def run_one_game(tuple_of_args):
             p2_rewards.append(reward)
         if g.phase == Phase.Movement:
             num_turns += 1
-        # if does_draw:
-        #     g.pg_draw_points(p2.possible_opp_positions, (255,255,255), 10)
-        #     g.pg_draw_points([p2.average_enemy_loc], (0,128,128), 0)
-        #     g.pg.display.flip()
-            # if g.phase == Phase.Movement:
-            #     input()
+        if does_draw:
+            g.pg_draw_points(p1.possible_opp_positions, (255,255,255), 10)
+            g.pg_draw_points([p1.average_enemy_loc], (0,128,128), 0)
+            g.pg.display.flip()
+        if g.phase == Phase.Movement:
+            input()
         if should_print: print("obs: ", obs)
         if should_print: print("reward: ", reward)
         if should_print: print("done: ", done)
@@ -55,8 +55,8 @@ def main():
     # human_playing = True
     # does_draw = False
     does_draw = True
-    should_print = False
-    # should_print = True
+    # should_print = False
+    should_print = True
 
     # dont_mp = True
     dont_mp = False
@@ -76,8 +76,8 @@ def main():
         actor1 = Human_Actor
         actor2 = Expert_Actor
     else:
-        actor1 = Random_Actor
-        actor2 = Expert_Actor
+        actor1 = Expert_Actor
+        actor2 = Random_Actor
 
     if not does_draw and not should_print and not human_playing and not dont_mp:
         pool = mp.Pool(processes=mp.cpu_count())

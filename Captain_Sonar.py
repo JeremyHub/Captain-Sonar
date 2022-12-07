@@ -1,9 +1,9 @@
 from .actors.expert_actor import Expert_Actor
 from .game.game import CaptainSonar
-# from .abstract_game import AbstractGame
-# from .muzero_config import MuZeroConfig
+from .abstract_game import AbstractGame
+from .muzero_config import MuZeroConfig
 
-class Game():
+class Game(AbstractGame):
     """
     Game wrapper.
     """
