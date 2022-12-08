@@ -41,8 +41,8 @@ def run_one_game(tuple_of_args):
             g.pg_draw_points(p1.possible_opp_positions, (255,255,255), 10)
             g.pg_draw_points([p1.average_enemy_loc], (0,128,128), 0)
             g.pg.display.flip()
-        if g.phase == Phase.Movement:
-            input()
+        # if g.phase == Phase.Movement:
+        #     input()
         if should_print: print("obs: ", obs)
         if should_print: print("reward: ", reward)
         if should_print: print("done: ", done)
@@ -55,8 +55,8 @@ def main():
     # human_playing = True
     # does_draw = False
     does_draw = True
-    # should_print = False
-    should_print = True
+    should_print = False
+    # should_print = True
 
     # dont_mp = True
     dont_mp = False

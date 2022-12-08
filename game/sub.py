@@ -30,6 +30,7 @@ class Sub:
     
     def set_starting_loc(self, loc: tuple):
         assert self.path == [], "setting starting loc of existing sub"
+        self.path.append(loc)
         self.loc = loc
 
     
