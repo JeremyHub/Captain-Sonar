@@ -325,7 +325,6 @@ class CaptainSonar:
         # update paths of subs
         for player, color, offset in l:
             if len(player.path) > 1:
-                path = player.path
                 self.pg.draw.lines(self.screen, color, False, [self._get_coord_center_on_board(p, offset) for p in player.path+[player.loc]], self.SCREEN_HEIGHT//200)
         # update paths of silences
         for player, color, offset in l:
