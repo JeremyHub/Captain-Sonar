@@ -3,7 +3,7 @@ from typing import Any
 from .action_dict import make_action_dict
 from .observation import Observation, Public_Actions
 from .sub import Sub
-from .constants import Player, Direction, ALPHA_BOARD, Power
+from .constants import Player, Direction, ALPHA_BOARD_TURN_BY_TURN, Power
 
 
 class Phase(Enum):
@@ -44,7 +44,7 @@ class CaptainSonar:
 
     def __init__(self, does_draw = False):
         self.does_draw = does_draw
-        self.board = ALPHA_BOARD
+        self.board = ALPHA_BOARD_TURN_BY_TURN
         self.ACTION_DICT = make_action_dict(len(self.board), len(self.board[0]))
         self.REVERSE_ACTION_DICT = {v: k for k, v in self.ACTION_DICT.items()}
         if self.does_draw:
@@ -90,7 +90,7 @@ class CaptainSonar:
         self.screen.fill((0,0,0))
         self.setup_boards("Captain-Sonar/res/powers.png", BoardNumDisplay.Powers)
         self.setup_boards("Captain-Sonar/res/breakdowns.png", BoardNumDisplay.Breakdowns)
-        self.setup_map("Captain-Sonar/res/alpha_map.png")
+        self.setup_map("Captain-Sonar/res/alpha_map_turn_by_turn.png")
 
 
     def setup_map(self, path):
@@ -116,7 +116,7 @@ class CaptainSonar:
         self._pg_update_powers()
         self._pg_update_damage()
         self._pg_update_player_pos_and_path()
-        self.pg.display.flip()
+        # self.pg.display.flip()
 
 
     def to_play(self):
@@ -307,17 +307,17 @@ class CaptainSonar:
 
 
     def _get_x_on_board(self, x: int):
-        return self.SCREEN_WIDTH/23 + x*self.SCREEN_WIDTH/49.7
+        return self.SCREEN_WIDTH/23 + x*self.SCREEN_WIDTH/(3.31333*len(self.board[0]))
 
 
     def _get_y_on_board(self, y: int):
-        return self.SCREEN_HEIGHT/6.1 + y*self.SCREEN_HEIGHT/18.7
+        return self.SCREEN_HEIGHT/6.1 + y*self.SCREEN_HEIGHT/(1.246666*len(self.board))
 
 
     def _pg_update_player_pos_and_path(self):
         x = self._get_x_on_board
         y = self._get_y_on_board
-        l = [(self.p1, self.P1_COLOR, -self.SCREEN_HEIGHT*0.004), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT*0.004)]
+        l = [(self.p1, self.P1_COLOR, -self.SCREEN_HEIGHT*((0.004/15)*len(self.board[0]))), (self.p2, self.P2_COLOR, self.SCREEN_HEIGHT*((0.004/15)*len(self.board[0])))]
         for player, color, offset in l:
             if player.loc:
                 rec = self.pg.Rect(x(player.loc[1])+offset, y(player.loc[0])+offset, self.SCREEN_WIDTH/80, self.SCREEN_HEIGHT/40)
