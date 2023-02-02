@@ -307,11 +307,11 @@ class CaptainSonar:
 
 
     def _get_x_on_board(self, x: int):
-        return self.SCREEN_WIDTH/23 + x*self.SCREEN_WIDTH/(3.31333*len(self.board[0]))
+        return self.SCREEN_WIDTH/23 + x*self.SCREEN_WIDTH/(3.2*len(self.board[0]))
 
 
     def _get_y_on_board(self, y: int):
-        return self.SCREEN_HEIGHT/6.1 + y*self.SCREEN_HEIGHT/(1.246666*len(self.board))
+        return self.SCREEN_HEIGHT/6.3 + y*self.SCREEN_HEIGHT/(1.2*len(self.board))
 
 
     def _pg_update_player_pos_and_path(self):
