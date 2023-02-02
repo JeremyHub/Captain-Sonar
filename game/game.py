@@ -337,7 +337,6 @@ class CaptainSonar:
             rec = self.pg.Rect(self._get_x_on_board(col)+offset, self._get_y_on_board(row)+offset, self.SCREEN_WIDTH/160, self.SCREEN_HEIGHT/80)
             self.pg.draw.rect(self.screen, color, rec)
 
-
     def _pg_update_damage(self):
         for damage, height, color in [(self.p1.damage, 0, self.P1_COLOR), (self.p2.damage, self.SCREEN_HEIGHT/2, self.P2_COLOR)]:
             x = self._get_secondary_board_x(BoardNumDisplay.Powers)*1.349
